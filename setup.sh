@@ -188,8 +188,14 @@ check_version() {
     eval ${cmd}_version $req
 }
 
+config_backend() {
+    sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
+}
+
 check_command docker
 check_version jk $JK_VERSION
 check_version footloose $FOOTLOOSE_VERSION
-check_version ignite $IGNITE_VERSION
+if [ $(config_backend) == "ignite" ]; then
+    check_version ignite $IGNITE_VERSION
+fi
 check_version wksctl $WKSCTL_VERSION
