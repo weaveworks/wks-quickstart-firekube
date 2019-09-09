@@ -199,7 +199,7 @@ while test $# -gt 0; do
     --git-deploy-key)
         shift
         git_deploy_key="--git-deploy-key $1"
-        log "Using git deploy key: $git_deploy_key"
+        log "Using git deploy key: $1"
         ;;
     *)
         error "unknown argument '$arg'"
