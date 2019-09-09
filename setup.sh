@@ -238,6 +238,8 @@ git add footloose.yaml machines.yaml
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push
 
+log "Updating container images and git parameters"
+wksctl init --git-url=$(git config --get remote.origin.url) --git-branch=$(git rev-parse --abbrev-ref HEAD)
 log "Installing Kubernetes cluster"
-wksctl apply --git-url $(git config --get remote.origin.url) --git-branch=$( git rev-parse --abbrev-ref HEAD) $git_deploy_key
+wksctl apply --git-url=$(git config --get remote.origin.url) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
 wksctl kubeconfig
