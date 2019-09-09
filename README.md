@@ -10,6 +10,8 @@ nodes are running inside containers which will on both Linux and macOS.
 
 ## Creating a Firekube cluster
 
+1. Download the latest versions of [footloose][dl-footloose], [jk][dl-jk] and [wksctl][dl-wksctl] as well as [ignite][dl-ignite] (Linux only).
+
 1. Fork this repository.
 
 1. Clone your fork and `cd` into it:
@@ -62,6 +64,10 @@ Enjoy your Kubernetes cluster!
    a5cf619fa058882d   Ready    <none>   75s     v1.14.1
    ```
 
+[dl-footloose]: https://github.com/weaveworks/footloose/releases/tag/0.6.1
+[dl-jk]: https://github.com/jkcfg/jk/releases
+[dl-wksctl]: https://github.com/weaveworks/wksctl/releases
+[dl-ignite]: https://github.com/weaveworks/ignite/releases/tag/v0.5.2
 [gh-ignite]: https://github.com/weaveworks/ignite
 [gh-firecracker]: https://github.com/firecracker-microvm/firecracker
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
