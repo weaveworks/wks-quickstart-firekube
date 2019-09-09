@@ -25,7 +25,7 @@ nodes are running inside containers which will on both Linux and macOS.
    ssh-keygen -t rsa -b 4096 -C "damien+firekube@weave.works" -f deploy-firekube  -N ""
    ```
 
-1. Upload the deploy to your fork (with read/write access):
+1. Upload the deploy key to your fork (with read/write access):
 
    ![deploy key upload](docs/deploy-key.png)
 
