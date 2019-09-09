@@ -192,6 +192,22 @@ config_backend() {
     sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
 }
 
+git_deploy_key=""
+
+while test $# -gt 0; do
+    case $1 in
+    --git-deploy-key)
+        shift
+        git_deploy_key="--git-deploy-key $1"
+        log "Using git deploy key: $git_deploy_key"
+        ;;
+    *)
+        error "unknown argument '$arg'"
+        ;;
+    esac
+    shift
+done
+
 check_command docker
 check_version jk $JK_VERSION
 check_version footloose $FOOTLOOSE_VERSION
@@ -199,3 +215,28 @@ if [ $(config_backend) == "ignite" ]; then
     check_version ignite $IGNITE_VERSION
 fi
 check_version wksctl $WKSCTL_VERSION
+
+log "Creating footloose manifest"
+jk generate -f config.yaml setup.js
+
+sudo=""
+if [ $(config_backend) == "ignite" ]; then
+    sudo="sudo env PATH=$PATH";
+fi
+
+log "Creating virtual machines"
+$sudo footloose create
+
+log "Creating Cluster API manifests"
+status=footloose-status.yaml
+$sudo footloose status -o json > $status
+jk generate -f config.yaml -f $status setup.js
+rm -f $status
+
+log "Pushing initial cluster configuration"
+git add footloose.yaml machines.yaml
+git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
+git push
+
+log "Installing Kubernetes cluster"
+wksctl apply --git-url $(git config --get remote.origin.url) --git-branch=$( git rev-parse --abbrev-ref HEAD) $git_deploy_key
