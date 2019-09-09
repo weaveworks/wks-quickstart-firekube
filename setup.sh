@@ -8,7 +8,7 @@ IGNITE_VERSION=0.5.2
 WKSCTL_VERSION=0.7.0
 
 log() {
-    echo $*
+    echo "•" $*
 }
 
 error() {
@@ -63,10 +63,10 @@ version_check() {
     local version=$2
     local req=$3
 
-    log "$cmd: found version $version"
+    log "Found $cmd $version"
 
     if version_lt $version $req;  then
-        help $cmd "found version $version but $req is the minimum required version."
+        help $cmd "Found version $version but $req is the minimum required version."
     fi
 }
 
