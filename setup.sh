@@ -233,13 +233,15 @@ $sudo footloose status -o json > $status
 jk generate -f config.yaml -f $status setup.js
 rm -f $status
 
+log "Updating container images and git parameters"
+wksctl init --git-url=$(git config --get remote.origin.url) --git-branch=$(git rev-parse --abbrev-ref HEAD)
+
 log "Pushing initial cluster configuration"
-git add footloose.yaml machines.yaml
+git add footloose.yaml machines.yaml flux.yaml wks-controller.yaml
+
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push
 
-log "Updating container images and git parameters"
-wksctl init --git-url=$(git config --get remote.origin.url) --git-branch=$(git rev-parse --abbrev-ref HEAD)
 log "Installing Kubernetes cluster"
 wksctl apply --git-url=$(git config --get remote.origin.url) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
 wksctl kubeconfig
