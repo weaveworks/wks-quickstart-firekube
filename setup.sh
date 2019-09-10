@@ -28,6 +28,58 @@ check_command() {
     fi
 }
 
+goos() {
+    local os=$(uname -s)
+    case $os in
+    Linux*)
+        echo linux;;
+    Darwin*)
+        echo darwin;;
+    *)
+        error "unknown OS: ${os}";;
+    esac
+}
+
+arch() {
+    echo $(uname -m)
+}
+
+goarch() {
+    local arch=$(uname -m)
+    case $arch in
+    armv5*)
+        echo "armv5";;
+    armv6*)
+        echo "armv6";;
+    armv7*)
+        echo "armv7";;
+    aarch64)
+        echo "arm64";;
+    x86)
+        echo "386";;
+    x86_64)
+        echo "amd64";;
+    i686)
+        echo "386";;
+    i386)
+        echo "386";;
+    *)
+        error "uknown arch: ${arch}";;
+    esac
+}
+
+mktempdir() {
+    echo `mktemp -d 2>/dev/null || mktemp -d -t 'firekube'`
+}
+
+do_curl() {
+    local path=$1
+    local url=$2
+
+    log "Downloading $url"
+    curl --progress-bar -fLo $path $url
+}
+
 # Given $1 and $2 as semantic version numbers like 3.1.2, return [ $1 < $2 ]
 version_lt() {
     VERSION_MAJOR=${1%.*.*}``
@@ -47,6 +99,13 @@ version_lt() {
         return 0
     fi
     return 1
+}
+
+download() {
+    local cmd=$1
+    local version=$2
+
+    eval ${cmd}_download $cmd $version
 }
 
 help() {
@@ -81,6 +140,30 @@ footloose_help() {
     echo "  • Required version: $FOOTLOOSE_VERSION"
 }
 
+footloose_download() {
+    local cmd=$1
+    local version=$2
+
+    os=$(goos)
+    case $os in
+    linux)
+        do_curl ~/.wks/bin/$cmd https://github.com/weaveworks/footloose/releases/download/${version}/footloose-${version}-${os}-$(arch)
+        chmod +x ~/.wks/bin/$cmd
+        ;;
+    darwin)
+        dldir=$(mktempdir)
+        mkdir $dldir/$cmd
+        do_curl $dldir/$cmd.tar.gz https://github.com/weaveworks/footloose/releases/download/${version}/footloose-${version}-${os}-$(arch).tar.gz
+        tar -C $dldir/$cmd -xvf $dldir/$cmd.tar.gz
+        mv $dldir/$cmd/footloose ~/.wks/bin/footloose
+        rm -rf $dldir
+        ;;
+    *)
+        error "unknown OS: $os"
+        ;;
+    esac
+}
+
 footloose_version() {
     local cmd="footloose"
     local req=$1
@@ -109,6 +192,14 @@ ignite_help() {
     echo "  • Required version: $IGNITE_VERSION"
 }
 
+ignite_download() {
+    local cmd=$1
+    local version=$2
+
+    do_curl ~/.wks/bin/$cmd https://github.com/weaveworks/ignite/releases/download/v${version}/ignite-$(goarch)
+    chmod +x ~/.wks/bin/$cmd
+}
+
 ignite_version() {
     local cmd="ignite"
     local req=$1
@@ -116,7 +207,7 @@ ignite_version() {
 
     # ignite currently needs root permissions, even to display its version
     # https://github.com/weaveworks/ignite/issues/406
-    if ! version=$(sudo $cmd version -o short | sed -n -e 's#^v\(.*\)#\1#p') || [ -z "$version" ]; then
+    if ! version=$($sudo $cmd version -o short | sed -n -e 's#^v\(.*\)#\1#p') || [ -z "$version" ]; then
         help $cmd "error running '$cmd version'."
     fi
 
@@ -133,6 +224,14 @@ jk_help() {
     echo "  • Installation    : https://github.com/jkcfg/jk#quick-start"
     echo "  •                 : https://jkcfg.github.io/#/documentation/quick-start"
     echo "  • Required version: $JK_VERSION"
+}
+
+jk_download() {
+    local cmd=$1
+    local version=$2
+
+     do_curl ~/.wks/bin/jk https://github.com/jkcfg/jk/releases/download/${version}/jk-$(goos)-$(goarch)
+     chmod +x ~/.wks/bin/jk
 }
 
 jk_version() {
@@ -158,6 +257,18 @@ wksctl_help() {
     echo "  • Required version: $WKSCTL_VERSION"
 }
 
+wksctl_download() {
+    local cmd=$1
+    local version=$2
+
+    dldir=$(mktempdir)
+    mkdir $dldir/$cmd
+    do_curl $dldir/$cmd.tar.gz https://github.com/weaveworks/wksctl/releases/download/${version}/wksctl-${version}-$(goos)-$(arch).tar.gz
+    tar -C $dldir/$cmd -xvf $dldir/$cmd.tar.gz
+    mv $dldir/$cmd/wksctl ~/.wks/bin/wksctl
+    rm -rf $dldir
+}
+
 wksctl_version() {
     local cmd="wksctl"
     local req=$1
@@ -179,10 +290,14 @@ check_version() {
     local cmd=$1
     local req=$2
 
-    if ! command_exists $cmd; then
-        log "$cmd: command not found"
-        eval ${cmd}_help
-        exit 1
+    if ! command_exists $cmd || [ $download_force == "yes" ]; then
+        if [ $download == "yes" ]; then
+            download $cmd $req
+        else
+            log "$cmd: command not found"
+            eval ${cmd}_help
+            exit 1
+        fi
     fi
 
     eval ${cmd}_version $req
@@ -193,9 +308,17 @@ config_backend() {
 }
 
 git_deploy_key=""
+download="yes"
+download_force="no"
 
 while test $# -gt 0; do
     case $1 in
+    --no-download)
+        download="no"
+        ;;
+    --force-download)
+        download_force="yes"
+        ;;
     --git-deploy-key)
         shift
         git_deploy_key="--git-deploy-key $1"
@@ -208,21 +331,23 @@ while test $# -gt 0; do
     shift
 done
 
+if [ $download == "yes" ]; then
+    mkdir -p ~/.wks/bin
+    export PATH=~/.wks/bin:$PATH
+fi
+
 check_command docker
 check_version jk $JK_VERSION
 check_version footloose $FOOTLOOSE_VERSION
+sudo=""
 if [ $(config_backend) == "ignite" ]; then
+    sudo="sudo env PATH=$PATH";
     check_version ignite $IGNITE_VERSION
 fi
 check_version wksctl $WKSCTL_VERSION
 
 log "Creating footloose manifest"
 jk generate -f config.yaml setup.js
-
-sudo=""
-if [ $(config_backend) == "ignite" ]; then
-    sudo="sudo env PATH=$PATH";
-fi
 
 log "Creating virtual machines"
 $sudo footloose create
