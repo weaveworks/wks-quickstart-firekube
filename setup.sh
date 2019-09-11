@@ -80,6 +80,14 @@ do_curl() {
     curl --progress-bar -fLo $path $url
 }
 
+do_curl_binary() {
+    local cmd=$1
+    local url=$2
+
+    do_curl ~/.wks/bin/$cmd $url
+    chmod +x ~/.wks/bin/$cmd
+}
+
 # Given $1 and $2 as semantic version numbers like 3.1.2, return [ $1 < $2 ]
 version_lt() {
     VERSION_MAJOR=${1%.*.*}``
@@ -147,8 +155,7 @@ footloose_download() {
     os=$(goos)
     case $os in
     linux)
-        do_curl ~/.wks/bin/$cmd https://github.com/weaveworks/footloose/releases/download/${version}/footloose-${version}-${os}-$(arch)
-        chmod +x ~/.wks/bin/$cmd
+        do_curl_binary $cmd https://github.com/weaveworks/footloose/releases/download/${version}/footloose-${version}-${os}-$(arch)
         ;;
     darwin)
         dldir=$(mktempdir)
@@ -196,8 +203,7 @@ ignite_download() {
     local cmd=$1
     local version=$2
 
-    do_curl ~/.wks/bin/$cmd https://github.com/weaveworks/ignite/releases/download/v${version}/ignite-$(goarch)
-    chmod +x ~/.wks/bin/$cmd
+    do_curl_binary $cmd https://github.com/weaveworks/ignite/releases/download/v${version}/ignite-$(goarch)
 }
 
 ignite_version() {
@@ -230,8 +236,7 @@ jk_download() {
     local cmd=$1
     local version=$2
 
-     do_curl ~/.wks/bin/jk https://github.com/jkcfg/jk/releases/download/${version}/jk-$(goos)-$(goarch)
-     chmod +x ~/.wks/bin/jk
+     do_curl_binary $cmd https://github.com/jkcfg/jk/releases/download/${version}/jk-$(goos)-$(goarch)
 }
 
 jk_version() {
