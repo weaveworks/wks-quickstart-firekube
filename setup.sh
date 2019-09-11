@@ -88,6 +88,18 @@ do_curl_binary() {
     chmod +x ~/.wks/bin/$cmd
 }
 
+do_curl_tarball() {
+    local cmd=$1
+    local url=$2
+
+    dldir=$(mktempdir)
+    mkdir $dldir/$cmd
+    do_curl $dldir/$cmd.tar.gz https://github.com/weaveworks/wksctl/releases/download/${version}/wksctl-${version}-$(goos)-$(arch).tar.gz
+    tar -C $dldir/$cmd -xvf $dldir/$cmd.tar.gz
+    mv $dldir/$cmd/$cmd ~/.wks/bin/$cmd
+    rm -rf $dldir
+}
+
 # Given $1 and $2 as semantic version numbers like 3.1.2, return [ $1 < $2 ]
 version_lt() {
     VERSION_MAJOR=${1%.*.*}``
@@ -158,12 +170,7 @@ footloose_download() {
         do_curl_binary $cmd https://github.com/weaveworks/footloose/releases/download/${version}/footloose-${version}-${os}-$(arch)
         ;;
     darwin)
-        dldir=$(mktempdir)
-        mkdir $dldir/$cmd
-        do_curl $dldir/$cmd.tar.gz https://github.com/weaveworks/footloose/releases/download/${version}/footloose-${version}-${os}-$(arch).tar.gz
-        tar -C $dldir/$cmd -xvf $dldir/$cmd.tar.gz
-        mv $dldir/$cmd/footloose ~/.wks/bin/footloose
-        rm -rf $dldir
+        do_curl_tarball $cmd https://github.com/weaveworks/footloose/releases/download/${version}/footloose-${version}-${os}-$(arch).tar.gz
         ;;
     *)
         error "unknown OS: $os"
@@ -266,12 +273,7 @@ wksctl_download() {
     local cmd=$1
     local version=$2
 
-    dldir=$(mktempdir)
-    mkdir $dldir/$cmd
-    do_curl $dldir/$cmd.tar.gz https://github.com/weaveworks/wksctl/releases/download/${version}/wksctl-${version}-$(goos)-$(arch).tar.gz
-    tar -C $dldir/$cmd -xvf $dldir/$cmd.tar.gz
-    mv $dldir/$cmd/wksctl ~/.wks/bin/wksctl
-    rm -rf $dldir
+    do_curl_tarball $cmd https://github.com/weaveworks/wksctl/releases/download/${version}/wksctl-${version}-$(goos)-$(arch).tar.gz
 }
 
 wksctl_version() {
