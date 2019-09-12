@@ -114,11 +114,12 @@ items:
           - --git-branch=master
           - --git-poll-interval=30s
           - --git-path="."
+          - --git-readonly
           - --memcached-hostname=memcached.weavek8sops.svc.cluster.local
           - --memcached-service=memcached
           - --listen-metrics=:3031
           - --sync-garbage-collection
-          image: fluxcd/flux:1.13.3
+          image: fluxcd/flux:1.14.2
           imagePullPolicy: IfNotPresent
           name: flux
           ports:
