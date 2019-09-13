@@ -100,16 +100,23 @@ do_curl_tarball() {
     rm -rf $dldir
 }
 
+clean_version() {
+    echo $1 | sed -n -e 's#^\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*#\1#p'
+}
+
 # Given $1 and $2 as semantic version numbers like 3.1.2, return [ $1 < $2 ]
 version_lt() {
-    VERSION_MAJOR=${1%.*.*}``
-    REST=${1%.*} VERSION_MINOR=${REST#*.}
-    # strip garbage after the patch version
-    VERSION_PATCH=$(echo ${1#*.*.} | sed -n -e 's#\([0-9][0-9]*\).*#\1#p')
+    # clean up the version string
+    local a=$(clean_version $1)
+    local b=$(clean_version $2)
 
-    MIN_VERSION_MAJOR=${2%.*.*}
-    REST=${2%.*} MIN_VERSION_MINOR=${REST#*.}
-    MIN_VERSION_PATCH=${2#*.*.}
+    VERSION_MAJOR=${a%.*.*}
+    REST=${a%.*} VERSION_MINOR=${REST#*.}
+    VERSION_PATCH=${a#*.*.}
+
+    MIN_VERSION_MAJOR=${b%.*.*}
+    REST=${b%.*} MIN_VERSION_MINOR=${REST#*.}
+    MIN_VERSION_PATCH=${b#*.*.}
 
     if [ \( "$VERSION_MAJOR" -lt "$MIN_VERSION_MAJOR" \) -o \
         \( "$VERSION_MAJOR" -eq "$MIN_VERSION_MAJOR" -a \
