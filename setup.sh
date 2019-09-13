@@ -183,7 +183,7 @@ footloose_version() {
     local req=$1
     local version
 
-    if ! version=$($cmd version | sed -n -e 's#^version: \(.*\)#\1#p') || [ -z "$version" ]; then
+    if ! version=$($cmd version | sed -n -e 's#^version: \([0-9g][0-9\.it]*\)$#\1#p') || [ -z "$version" ]; then
         help $cmd "error running '$cmd version'."
     fi
 
