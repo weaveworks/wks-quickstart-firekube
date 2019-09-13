@@ -187,7 +187,7 @@ footloose_version() {
         help $cmd "error running '$cmd version'."
     fi
 
-    if [ $version == "git" ]; then
+    if [ "$version" == "git" ]; then
         log "$cmd: detected git build, continuing"
         return
     fi
@@ -285,7 +285,7 @@ wksctl_version() {
         help $cmd "error running '$cmd version'."
     fi
 
-    if [ $version == "undefined" ]; then
+    if [ "$version" == "undefined" ]; then
         log "$cmd: detected git build, continuing"
         return
     fi
