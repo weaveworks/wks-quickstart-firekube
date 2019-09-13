@@ -12,22 +12,13 @@ nodes are running inside containers which will on both Linux and macOS.
 
 1. Fork this repository.
 
-1. Clone your fork and `cd` into it:
+1. Clone your fork and `cd` into it. Use the `https` git URL as it doesn't
+need authentication:
 
    ```console
-   git clone git@github.com:$user/wks-quickstart-firekube.git
+   git clone https://github.com/$user/wks-quickstart-firekube.git
    cd wks-quickstart-firekube
    ```
-
-1. Create an SSH key pair:
-
-   ```console
-   ssh-keygen -t rsa -b 4096 -C "damien+firekube@weave.works" -f deploy-firekube  -N ""
-   ```
-
-1. Upload the deploy key to your fork (with read/write access):
-
-   ![deploy key upload](docs/deploy-key.png)
 
 1. (optional) If you are on macOS or want to use docker containers instead of [firecracker][gh-firecracker] virtual machines, change the backend to `docker` in `config.yaml`:
 
@@ -42,7 +33,7 @@ nodes are running inside containers which will on both Linux and macOS.
 
    ```console
    cd wks-quickstart-firekube
-   ./setup.sh --git-deploy-key  ./deploy-firekube
+   ./setup.sh
    ```
 
    This step will take several minutes.
@@ -66,3 +57,36 @@ Enjoy your Kubernetes cluster!
 [gh-firecracker]: https://github.com/firecracker-microvm/firecracker
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
+
+## Using a private git repository with firekube
+
+To use a private git repository instead of a fork of `wks-quickstart-firekube`:
+
+1. Create a private repository and push the `wks-quickstart-firekube`
+   `master` branch there. Use the SSH git URL when cloning the private
+   repository:
+
+   ```
+   git clone git@github.com:$user/$repository.git
+   cd $repository
+   git remote add quickstart git@github.com:weaveworks/wks-quickstart-firekube.git
+   git fetch quickstart
+   git merge quickstart/master
+   git push
+   ```
+
+1. Create an SSH key pair:
+
+   ```console
+   ssh-keygen -t rsa -b 4096 -C "damien+firekube@weave.works" -f deploy-firekube  -N ""
+   ```
+
+1. Upload the deploy key to your private repository (with read/write access):
+
+   ![deploy key upload](docs/deploy-key.png)
+
+1. Start the cluster:
+
+   ```console
+   ./setup.sh --git-deploy-key  ./deploy-firekube
+   ```
