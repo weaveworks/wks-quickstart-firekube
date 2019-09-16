@@ -356,6 +356,13 @@ check_version wksctl $WKSCTL_VERSION
 log "Creating footloose manifest"
 jk generate -f config.yaml setup.js
 
+cluster_key="cluster-key"
+if [ ! -f "$cluster_key" ]; then
+    # Create the cluster ssh key with the user credentials.
+    log "Creating SSH key"
+    ssh-keygen -q -t rsa -b 4096 -C firekube@footloose.mail -f $cluster_key -N ""
+fi
+
 log "Creating virtual machines"
 $sudo footloose create
 
