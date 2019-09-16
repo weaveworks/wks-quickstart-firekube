@@ -58,6 +58,14 @@ Enjoy your Kubernetes cluster!
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
 
+## Deleting a Firekube cluster
+
+Run:
+
+```console
+./cleanup.sh
+```
+
 ## Using a private git repository with firekube
 
 To use a private git repository instead of a fork of `wks-quickstart-firekube`:
