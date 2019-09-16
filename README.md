@@ -66,3 +66,11 @@ Enjoy your Kubernetes cluster!
 [gh-firecracker]: https://github.com/firecracker-microvm/firecracker
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
+
+## Deleting a Firekube cluster
+
+Run:
+
+```console
+./cleanup.sh
+```
