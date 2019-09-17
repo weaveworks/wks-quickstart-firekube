@@ -4,7 +4,7 @@ set -euo pipefail
 
 JK_VERSION=0.3.0
 FOOTLOOSE_VERSION=0.6.1
-IGNITE_VERSION=0.5.2
+IGNITE_VERSION=0.5.3
 WKSCTL_VERSION=0.8.0-beta.1
 
 log() {
@@ -225,9 +225,7 @@ ignite_version() {
     local req=$1
     local version
 
-    # ignite currently needs root permissions, even to display its version
-    # https://github.com/weaveworks/ignite/issues/406
-    if ! version=$($sudo $cmd version -o short | sed -n -e 's#^v\(.*\)#\1#p') || [ -z "$version" ]; then
+    if ! version=$($cmd version -o short | sed -n -e 's#^v\(.*\)#\1#p') || [ -z "$version" ]; then
         help $cmd "error running '$cmd version'."
     fi
 
