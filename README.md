@@ -98,3 +98,17 @@ To use a private git repository instead of a fork of `wks-quickstart-firekube`:
    ```console
    ./setup.sh --git-deploy-key  ./deploy-firekube
    ```
+
+## Getting Help
+
+If you have any questions about, feedback for or problems with `wksctl`:
+
+- Invite yourself to the <a href="https://slack.weave.works/" target="_blank">Weave Users Slack</a>.
+- Ask a question on the [#general](https://weave-community.slack.com/messages/general/) slack channel.
+- [File an issue](https://github.com/weaveworks/wks-quickstart-firekube/issues/new).
+
+Your feedback is always welcome!
+
+## License
+
+[Apache 2.0](LICENSE)
