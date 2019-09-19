@@ -12,11 +12,11 @@ nodes are running inside containers which will on both Linux and macOS.
 
 1. Fork this repository.
 
-1. Clone your fork and `cd` into it. Use the `https` git URL as it doesn't
-need authentication:
+1. Clone your fork and `cd` into it. Use the `SSH` git URL as the script will
+push an initial commit to your fork:
 
    ```console
-   git clone https://github.com/$user/wks-quickstart-firekube.git
+   git clone git@github.com:$user/wks-quickstart-firekube.git
    cd wks-quickstart-firekube
    ```
 
