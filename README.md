@@ -50,6 +50,42 @@ Enjoy your Kubernetes cluster!
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
 
+## Watch GipOps in action
+
+Now that we have a cluster installed, we can commit Kubernetes objects to the
+git repository and have them appear in the cluster. Let's add
+[podinfo][podinfo], an example Go microservice, to the cluster.
+
+[podinfo]: https://github.com/stefanprodan/podinfo
+
+```sh
+curl -fLo podinfo.yaml https://raw.githubusercontent.com/stefanprodan/podinfo/master/kustomize/deployment.yaml
+git add podinfo.yaml
+git commit -a -m 'Add podinfo Deployment'
+git push
+```
+
+A few seconds later, you should witness the apparition of a podinfo pod in
+the cluster:
+
+```console
+$ kubectl get pods
+NAME                       READY   STATUS    RESTARTS   AGE
+podinfo-677768c755-z76xk   1/1     Running   0          30s
+```
+
+To view `podinfo` web UI:
+
+1. Expose `podinfo` locally:
+
+   ```
+   kubectl port-forward deploy/podinfo 9898:9898
+   ```
+
+1. Point your browser to `http://127.0.0.1:9898`:
+
+   ![podinfo](docs/podinfo.png)
+
 ## Deleting a Firekube cluster
 
 Run:
