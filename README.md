@@ -32,7 +32,6 @@ push an initial commit to your fork:
 1. Start the cluster:
 
    ```console
-   cd wks-quickstart-firekube
    ./setup.sh
    ```
 
