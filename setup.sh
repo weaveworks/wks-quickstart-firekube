@@ -315,6 +315,14 @@ check_version() {
     eval ${cmd}_version $req
 }
 
+git_ssh_url() {
+    echo $1 | sed -e 's#^https://github.com/#git@github.com:#'
+}
+
+git_http_url() {
+    echo $1 | sed -e 's#^git@github.com:#https://github.com/#'
+}
+
 config_backend() {
     sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
 }
@@ -378,7 +386,7 @@ jk generate -f config.yaml -f $status setup.js
 rm -f $status
 
 log "Updating container images and git parameters"
-wksctl init --git-url=$(git config --get remote.origin.url) --git-branch=$(git rev-parse --abbrev-ref HEAD)
+wksctl init --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
 
 log "Pushing initial cluster configuration"
 git add footloose.yaml machines.yaml flux.yaml wks-controller.yaml
