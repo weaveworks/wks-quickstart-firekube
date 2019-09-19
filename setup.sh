@@ -327,6 +327,10 @@ config_backend() {
     sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
 }
 
+set_config_backend() {
+    sed -i -e "s/^backend: .*$/backend: $1/" config.yaml
+}
+
 git_deploy_key=""
 download="yes"
 download_force="no"
@@ -354,6 +358,11 @@ done
 if [ $download == "yes" ]; then
     mkdir -p ~/.wks/bin
     export PATH=~/.wks/bin:$PATH
+fi
+
+# On macOS, we only support the docker backend.
+if [ $(goos) == "darwin" ]; then
+    set_config_backend docker
 fi
 
 check_command docker

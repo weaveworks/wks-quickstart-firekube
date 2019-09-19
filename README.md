@@ -5,8 +5,9 @@ Firekube is a Kubernetes cluster working on top of [ignite][gh-ignite] and
 [GitOps][ww-gitops].
 
 [ignite][gh-ignite] and [firecracker][gh-firecracker] only work on Linux as
-they need [KVM][kvm]. Fortunately we also offer a mode where the Kubernetes
-nodes are running inside containers which will on both Linux and macOS.
+they need [KVM][kvm]. Fortunately we will also work on macOS using
+[footloose][footloose]: the Kubernetes nodes are then running inside
+containers.
 
 ## Creating a Firekube cluster
 
@@ -18,15 +19,6 @@ push an initial commit to your fork:
    ```console
    git clone git@github.com:$user/wks-quickstart-firekube.git
    cd wks-quickstart-firekube
-   ```
-
-1. (optional) If you are on macOS or want to use docker containers instead of [firecracker][gh-firecracker] virtual machines, change the backend to `docker` in `config.yaml`:
-
-   ```console
-   # Change backend: ignite to backend: docker in config.yaml
-   vim config.yaml
-   git add config.yaml
-   git commit -m "Change backend to docker"
    ```
 
 1. Start the cluster:
@@ -54,6 +46,7 @@ Enjoy your Kubernetes cluster!
 
 [gh-ignite]: https://github.com/weaveworks/ignite
 [gh-firecracker]: https://github.com/firecracker-microvm/firecracker
+[footloose]: https://github.com/weaveworks/footloose
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
 
