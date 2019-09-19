@@ -395,5 +395,5 @@ git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push
 
 log "Installing Kubernetes cluster"
-wksctl -v apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
+wksctl --verbose apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
 wksctl kubeconfig
