@@ -328,7 +328,11 @@ config_backend() {
 }
 
 set_config_backend() {
-    sed -i -e "s/^backend: .*$/backend: $1/" config.yaml
+    local tmp=.config.yaml.tmp
+
+    sed -e "s/^backend: .*$/backend: $1/" config.yaml > $tmp && \
+        mv $tmp config.yaml && \
+        rm -f $tmp
 }
 
 git_deploy_key=""
