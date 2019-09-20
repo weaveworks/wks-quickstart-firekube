@@ -402,7 +402,7 @@ log "Updating container images and git parameters"
 wksctl init --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
 
 log "Pushing initial cluster configuration"
-git add footloose.yaml machines.yaml flux.yaml wks-controller.yaml
+git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push
