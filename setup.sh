@@ -94,7 +94,7 @@ do_curl_tarball() {
 
     dldir=$(mktempdir)
     mkdir $dldir/$cmd
-    do_curl $dldir/$cmd.tar.gz https://github.com/weaveworks/wksctl/releases/download/${version}/wksctl-${version}-$(goos)-$(arch).tar.gz
+    do_curl $dldir/$cmd.tar.gz $url
     tar -C $dldir/$cmd -xvf $dldir/$cmd.tar.gz
     mv $dldir/$cmd/$cmd ~/.wks/bin/$cmd
     rm -rf $dldir
