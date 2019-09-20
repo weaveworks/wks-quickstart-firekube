@@ -327,6 +327,14 @@ config_backend() {
     sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
 }
 
+set_config_backend() {
+    local tmp=.config.yaml.tmp
+
+    sed -e "s/^backend: .*$/backend: $1/" config.yaml > $tmp && \
+        mv $tmp config.yaml && \
+        rm -f $tmp
+}
+
 git_deploy_key=""
 download="yes"
 download_force="no"
@@ -354,6 +362,11 @@ done
 if [ $download == "yes" ]; then
     mkdir -p ~/.wks/bin
     export PATH=~/.wks/bin:$PATH
+fi
+
+# On macOS, we only support the docker backend.
+if [ $(goos) == "darwin" ]; then
+    set_config_backend docker
 fi
 
 check_command docker
@@ -389,7 +402,7 @@ log "Updating container images and git parameters"
 wksctl init --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
 
 log "Pushing initial cluster configuration"
-git add footloose.yaml machines.yaml flux.yaml wks-controller.yaml
+git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push
