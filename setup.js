@@ -81,7 +81,8 @@ const Machine = ({ id, privateIP, sshPort, role }) => ({
     labels: {
       set: role,
     },
-    name: `${role}-${id}`
+    name: `${role}-${id}`,
+    namespace: 'weavek8sops'
   },
   spec: {
     providerSpec: {
