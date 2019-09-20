@@ -5,7 +5,7 @@ set -euo pipefail
 JK_VERSION=0.3.0
 FOOTLOOSE_VERSION=0.6.1
 IGNITE_VERSION=0.5.3
-WKSCTL_VERSION=0.8.0-beta.1
+WKSCTL_VERSION=0.8.0-beta.2
 
 log() {
     echo "•" $*
