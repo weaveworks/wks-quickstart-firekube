@@ -11,6 +11,8 @@ containers.
 
 ## Creating a Firekube cluster
 
+**Prerequisites**: docker, git, [kubectl 1.14+][kubectl].
+
 1. Fork this repository.
 
 1. Clone your fork and `cd` into it. Use the `SSH` git URL as the script will
@@ -47,6 +49,7 @@ Enjoy your Kubernetes cluster!
 [gh-ignite]: https://github.com/weaveworks/ignite
 [gh-firecracker]: https://github.com/firecracker-microvm/firecracker
 [footloose]: https://github.com/weaveworks/footloose
+[kubectl]: https://v1-14.docs.kubernetes.io/docs/tasks/tools/install-kubectl/
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
 
@@ -59,7 +62,7 @@ git repository and have them appear in the cluster. Let's add
 [podinfo]: https://github.com/stefanprodan/podinfo
 
 ```sh
-curl -fLo podinfo.yaml https://raw.githubusercontent.com/stefanprodan/podinfo/master/kustomize/deployment.yaml
+kubectl apply --dry-run -k github.com/stefanprodan/podinfo//kustomize -o yaml > podinfo.yaml
 git add podinfo.yaml
 git commit -a -m 'Add podinfo Deployment'
 git push
