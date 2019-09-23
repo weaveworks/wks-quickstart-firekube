@@ -11,6 +11,8 @@ containers.
 
 ## Creating a Firekube cluster
 
+**Prerequisites**: docker, git, [kubectl 1.14+][kubectl].
+
 1. Fork this repository.
 
 1. Clone your fork and `cd` into it. Use the `SSH` git URL as the script will
@@ -47,8 +49,45 @@ Enjoy your Kubernetes cluster!
 [gh-ignite]: https://github.com/weaveworks/ignite
 [gh-firecracker]: https://github.com/firecracker-microvm/firecracker
 [footloose]: https://github.com/weaveworks/footloose
+[kubectl]: https://v1-14.docs.kubernetes.io/docs/tasks/tools/install-kubectl/
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
+
+## Watch GitOps in action
+
+Now that we have a cluster installed, we can commit Kubernetes objects to the
+git repository and have them appear in the cluster. Let's add
+[podinfo][podinfo], an example Go microservice, to the cluster.
+
+[podinfo]: https://github.com/stefanprodan/podinfo
+
+```sh
+kubectl apply --dry-run -k github.com/stefanprodan/podinfo//kustomize -o yaml > podinfo.yaml
+git add podinfo.yaml
+git commit -a -m 'Add podinfo Deployment'
+git push
+```
+
+A few seconds later, you should witness the apparition of a podinfo pod in
+the cluster:
+
+```console
+$ kubectl get pods
+NAME                       READY   STATUS    RESTARTS   AGE
+podinfo-677768c755-z76xk   1/1     Running   0          30s
+```
+
+To view `podinfo` web UI:
+
+1. Expose `podinfo` locally:
+
+   ```
+   kubectl port-forward deploy/podinfo 9898:9898
+   ```
+
+1. Point your browser to `http://127.0.0.1:9898`:
+
+   ![podinfo](docs/podinfo.png)
 
 ## Deleting a Firekube cluster
 
