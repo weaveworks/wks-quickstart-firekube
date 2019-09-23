@@ -50,7 +50,7 @@ Enjoy your Kubernetes cluster!
 [kvm]: https://en.wikipedia.org/wiki/Kernel-based_Virtual_Machine
 [ww-gitops]: https://www.weave.works/technologies/gitops/
 
-## Watch GipOps in action
+## Watch GitOps in action
 
 Now that we have a cluster installed, we can commit Kubernetes objects to the
 git repository and have them appear in the cluster. Let's add
