@@ -405,6 +405,15 @@ log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
+
+# Confirm it works
+read -p "Would you like to push to origin? (y/n) " -n 1 -r
+echo
+# Checks if it is not a yes.. if so exit
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "To continue run `wksctl apply' against the repo and then `wksctl kubeconfig` after a push." && [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1
+fi
 git push
 
 log "Installing Kubernetes cluster"
