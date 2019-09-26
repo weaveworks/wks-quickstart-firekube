@@ -405,7 +405,34 @@ log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
-git push
+
+ORIGN=$(git config --get remote.origin.url)
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+PROTECT_MASTER="^(master|dev|release-*|patch-*)"
+echo 'Working on Repository: '$ORIGN
+echo 'On Branch: '$BRANCH
+
+read -p "Are you sure you want to push to \"$BRANCH\" ? (y/n): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; 
+then
+    if [[ "$BRANCH" =~ $PROTECT_MASTER ]]; 
+    then
+        read -p "Are you SURE you want to PUSH to MASTER ? (y/n): " -n 1 -r
+        echo
+        if [[ $REPLY =~ ^[Yy]$ ]];
+        then
+            git push
+            exit
+        else
+            echo 'Push aborted.'
+            exit
+        fi
+    fi
+    git push
+fi
+echo 'Push aborted.'
+exit
 
 log "Installing Kubernetes cluster"
 wksctl apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
