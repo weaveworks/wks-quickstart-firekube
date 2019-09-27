@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: docker
-  namespace: system
+  namespace: weavek8sops
 data:
   daemon.json: |
     {
