@@ -19,6 +19,8 @@ containers.
 push an initial commit to your fork:
 
    ```console
+   export user="" # Your GitHub handle or org
+   
    git clone git@github.com:$user/wks-quickstart-firekube.git
    cd wks-quickstart-firekube
    ```
