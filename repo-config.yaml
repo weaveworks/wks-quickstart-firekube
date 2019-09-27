@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: repo
-  namespace: system
+  namespace: weavek8sops
 data:
   kubernetes.repo: |
     [kubernetes]
