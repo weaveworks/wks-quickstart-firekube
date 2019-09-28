@@ -408,28 +408,16 @@ git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 
 ORIGN=$(git config --get remote.origin.url)
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
-PROTECT_MASTER="^(master|dev|release-*|patch-*)"
 echo 'Working on Repository: '$ORIGN
 echo 'On Branch: '$BRANCH
 
 read -p "Are you sure you want to push to \"$BRANCH\" ? (y/n): " -n 1 -r
 echo
-if [[ $REPLY =~ ^[Yy]$ ]]; 
+if [[ $REPLY =~ ^[Yy]$ ]];
 then
-    if [[ "$BRANCH" =~ $PROTECT_MASTER ]]; 
-    then
-        read -p "Are you SURE you want to PUSH to MASTER ? (y/n): " -n 1 -r
-        echo
-        if [[ $REPLY =~ ^[Yy]$ ]];
-        then
-            git push
-            exit
-        else
-            echo 'Push aborted.'
-            exit
-        fi
-    fi
     git push
+else
+    continue
 fi
 echo 'Push aborted.'
 exit
