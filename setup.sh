@@ -420,7 +420,6 @@ else
     continue
 fi
 echo 'Push aborted.'
-exit
 
 log "Installing Kubernetes cluster"
 wksctl apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
