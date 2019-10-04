@@ -398,15 +398,27 @@ $sudo footloose status -o json > $status
 jk generate -f config.yaml -f $status setup.js
 rm -f $status
 
+GIT_ORIGIN = `git config --get remote.origin.url`
+GIT_BRANCH = `git rev-parse --abbrev-ref HEAD`
+
 log "Updating container images and git parameters"
-wksctl init --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
+wksctl init --git-url=$(git_http_url $GIT_ORIGIN) --git-branch=$GIT_BRANCH
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
+
+# Confirm it works
+read -p "Would you like to push to origin/$GIT_BRANCH ($GIT_ORIGIN)? (y/n) " -n 1 -r
+echo
+# Checks if it is not a yes.. if so exit
+if [[ ! $REPLY =~ ^[Yy]$ ]]
+then
+    echo "To continue: push to origin, run `wksctl apply' against the origin repo, then execute `wksctl kubeconfig'." && [[ "$0" = "$BASH_SOURCE" ]] && exit 1 || return 1
+fi
 git push
 
 log "Installing Kubernetes cluster"
-wksctl apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
+wksctl apply --git-url=$(git_http_url $GIT_ORIGIN) --git-branch=$GIT_BRANCH $git_deploy_key
 wksctl kubeconfig
