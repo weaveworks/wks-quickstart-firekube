@@ -405,7 +405,23 @@ log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
-git push
+
+# Ask user for confirmation before pushing
+echo ""
+echo "Repository name: $(basename `git rev-parse --show-toplevel`)"
+echo "Current branch: $(git branch | grep \* | cut -d ' ' -f2)"
+echo "Pushing to remote: $(git remote -v | head -n1 | awk '{print $2}')"
+echo ""
+echo -n "Do you want to push your changes? [Y/n] "
+read choice
+
+if [ "$choice" == "Y" -o "$choice" == "y" -o "$choice" == "" ];
+then
+        git push
+else
+        echo "Please perform the push."
+        exit 1
+fi
 
 log "Installing Kubernetes cluster"
 wksctl apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
