@@ -20,7 +20,7 @@ push an initial commit to your fork:
 
    ```console
    export user="" # Your GitHub handle or org
-   
+
    git clone git@github.com:$user/wks-quickstart-firekube.git
    cd wks-quickstart-firekube
    ```
@@ -32,6 +32,9 @@ push an initial commit to your fork:
    ```
 
    This step will take several minutes.
+
+   **Please note** that the `setup.sh` script will detect which OS you're on.
+   If it's macOS, the script will automatically set `backend: docker` inside `config.yaml`. This config is to start the cluster in containers as there is no KVM on macOS. However, Firekube on Linux will run either with `backend: ignite` (ignite VMs) or `backend: docker` (containers). So the `setup.sh` script won't touch the backend value inside `config.yaml` if you're on Linux. In case you started Firekube (in containers) on macOS then switched to try it on Linux, please make sure that the backend value is set to `backend: ignite` so that you can start the cluster on ignite / firecracker VMs.
 
 1. Export the `KUBECONFIG` environment variable as indicated at the end of the installation:
 
