@@ -482,7 +482,7 @@ wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git
 
 # "Re-fix" controller image to use new image that calls out to footloose
 tmp=.image-swap.tmp
-sed -e "s,image: .*$,image: docker.io/jrryjcksn/wks-controller," wks-controller.yaml > $tmp && \
+sed -e "s,image: .*$,image: docker.io/jrryjcksn/wks-controller:footloose-scaling-d7b99ec2-WIP," wks-controller.yaml > $tmp && \
     mv $tmp wks-controller.yaml && \
     rm -f $tmp
 
