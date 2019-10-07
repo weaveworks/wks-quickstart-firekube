@@ -487,7 +487,7 @@ sed -e "s,image: .*$,image: docker.io/jrryjcksn/wks-controller:footloose-scaling
     rm -f $tmp
 
 log "Pushing initial cluster configuration"
-git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
+git add config.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push
