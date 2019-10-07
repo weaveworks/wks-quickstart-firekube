@@ -3,9 +3,12 @@
 set -euo pipefail
 
 JK_VERSION=0.3.0
-FOOTLOOSE_VERSION=0.6.2
+JQ_VERSION=1.6.0
+FOOTLOOSE_VERSION=0.6.1
 IGNITE_VERSION=0.5.4
 WKSCTL_VERSION=0.8.0
+FOOTLOOSE_SERVER_ADDR=172.17.0.1:5555
+FOOTLOOSE_CLUSTER_NAME=firekube
 
 log() {
     echo "•" $*
@@ -94,7 +97,7 @@ do_curl_tarball() {
 
     dldir=$(mktempdir)
     mkdir $dldir/$cmd
-    do_curl $dldir/$cmd.tar.gz $url
+    do_curl $dldir/$cmd.tar.gz https://github.com/weaveworks/wksctl/releases/download/${version}/wksctl-${version}-$(goos)-$(arch).tar.gz
     tar -C $dldir/$cmd -xvf $dldir/$cmd.tar.gz
     mv $dldir/$cmd/$cmd ~/.wks/bin/$cmd
     rm -rf $dldir
@@ -154,6 +157,53 @@ version_check() {
     if version_lt $version $req;  then
         help $cmd "Found version $version but $req is the minimum required version."
     fi
+}
+
+jq_help() {
+    echo "firekube needs jq to process footloose json data."
+    echo ""
+    echo "Please install jq version $JQ_VERSION or later:"
+    echo ""
+    echo "  • Installation    : https://stedolan.github.io/jq/download/"
+    echo "  • Required version: $JQ_VERSION"
+}
+
+jq_download() {
+    local cmd=$1
+    local version=$2
+
+    os=$(goos)
+    case $os in
+    linux)
+        arch=$(goarch)
+		case $arch in
+			"386")
+				do_curl_binary $cmd https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux32
+				;;
+			*)
+				do_curl_binary $cmd https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64
+				;;
+		esac
+		;;
+    darwin)
+        do_curl_binary $cmd https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64
+        ;;
+    *)
+        error "unknown OS: $os"
+        ;;
+    esac
+}
+
+jq_version() {
+    local cmd="jq"
+    local req=$1
+    local version
+
+    if ! version=$($cmd --version | sed -n -e 's#^jq-\(.*\)#\1.0#p') || [ -z "$version" ]; then
+        help jq "error running '$cmd --version'."
+    fi
+
+    version_check $cmd $version $req
 }
 
 footloose_help() {
@@ -329,10 +379,27 @@ config_backend() {
 
 set_config_backend() {
     local tmp=.config.yaml.tmp
-
     sed -e "s/^backend: .*$/backend: $1/" config.yaml > $tmp && \
         mv $tmp config.yaml && \
         rm -f $tmp
+}
+
+create_cluster() {
+    curl -s -S -d "{\"name\": \"$FOOTLOOSE_CLUSTER_NAME\", \"privateKey\": \"cluster-key\"}" http://$FOOTLOOSE_SERVER_ADDR/api/clusters	| jq -r '.uri'
+}
+
+create_machine() {
+	port_mappings=$(jq "[.machines | .[0] | .spec.portMappings | .[] | {containerPort: .containerPort, hostPort: (.hostPort + $2)}]" < $footloose_data)
+	curl -s -S -d "{\"name\": \"$1$2\", \"image\": \"quay.io/footloose/centos7:$FOOTLOOSE_VERSION\", \"privileged\": true, \"backend\": \"$(config_backend)\", \"portMappings\": $port_mappings}" \
+		 http://$FOOTLOOSE_SERVER_ADDR/api/clusters/$FOOTLOOSE_CLUSTER_NAME/machines | jq -r '.uri'
+}
+
+extra_fields() {
+	jq ".machines | .[] | .spec | {ignite: .ignite, portMappings: .portMappings, volumes: .volumes, ports: [.portMappings | .[] | {guest: .containerPort, host: (.hostPort + $1)}]}" < $footloose_data
+}
+
+augment_machine() {
+	jq ". + $(extra_fields $1) + {publicKey: \"$2\"}" <<< $3
 }
 
 git_deploy_key=""
@@ -372,6 +439,7 @@ fi
 check_command docker
 check_version jk $JK_VERSION
 check_version footloose $FOOTLOOSE_VERSION
+check_version jq $JQ_VERSION
 sudo=""
 if [ $(config_backend) == "ignite" ]; then
     sudo="sudo env PATH=$PATH";
@@ -390,16 +458,27 @@ if [ ! -f "$cluster_key" ]; then
 fi
 
 log "Creating virtual machines"
-$sudo footloose create
+$sudo footloose serve -l $FOOTLOOSE_SERVER_ADDR >> /tmp/footout&
+sleep 2
 
-log "Creating Cluster API manifests"
+footloose_data=footloose.json
+jk generate -f config.yaml setup.js -o json
+public_key=$(cat cluster-key.pub)
+
+create_cluster
+mach0_data=$(curl -s -S $(create_machine node 0))
+mach1_data=$(curl -s -S $(create_machine node 1))
+
+log "Creating Cluster and Cluster API manifests"
 status=footloose-status.yaml
-$sudo footloose status -o json > $status
+mach0=$(augment_machine 0 "$public_key" "$mach0_data")
+mach1=$(augment_machine 1 "$public_key" "$mach1_data")
+echo "{machines: [$mach0, $mach1]}" > $status
 jk generate -f config.yaml -f $status setup.js
-rm -f $status
+rm -f $status $footloose_data
 
 log "Updating container images and git parameters"
-wksctl init --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
+wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
@@ -408,5 +487,5 @@ git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push
 
 log "Installing Kubernetes cluster"
-wksctl apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
+wksctl apply --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
 wksctl kubeconfig

@@ -7,5 +7,4 @@ log() {
 }
 
 log "Deleting virtual machines"
-export PATH=~/.wks/bin:$PATH
-sudo env "PATH=$PATH" footloose delete
+curl -XDELETE http://172.17.0.1:5555/api/clusters/firekube

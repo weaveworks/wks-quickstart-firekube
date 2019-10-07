@@ -64,7 +64,7 @@ const footloose = config => ({
   }],
 });
 
-output.push({ path: 'footloose.yaml', value: footloose(config) });
+output.push({ path: 'footloose.json', value: footloose(config) });
 
 // List is a Kubernetes list.
 const List = items => ({
