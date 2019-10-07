@@ -480,6 +480,12 @@ rm -f $status $footloose_data
 log "Updating container images and git parameters"
 wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
 
+# "Re-fix" controller image to use new image that calls out to footloose
+tmp=.image-swap.tmp
+sed -e "s,image: .*$,image: docker.io/jrryjcksn/wks-controller," wks-controller.yaml > $tmp && \
+    mv $tmp wks-controller.yaml && \
+    rm -f $tmp
+
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
