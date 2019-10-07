@@ -478,7 +478,7 @@ jk generate -f config.yaml -f $status setup.js
 rm -f $status $footloose_data
 
 log "Updating container images and git parameters"
-wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
+wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) --version=footloose-scaling-d7b99ec2
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
