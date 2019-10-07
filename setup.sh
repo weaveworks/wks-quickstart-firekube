@@ -411,15 +411,15 @@ BRANCH=$(git rev-parse --abbrev-ref HEAD)
 echo 'Working on Repository: '$ORIGN
 echo 'On Branch: '$BRANCH
 
-read -p "Are you sure you want to push to \"$BRANCH\" ? (y/n): " -n 1 -r
+read -p "Are you sure you want to push to \"$BRANCH\" ? (y/N): " -n 1 -r
 echo
 if [[ $REPLY =~ ^[Yy]$ ]];
 then
     git push
 else
-    continue
+    echo "Push aborted."
+    exit
 fi
-echo 'Push aborted.'
 
 log "Installing Kubernetes cluster"
 wksctl apply --git-url=$(git_http_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) $git_deploy_key
