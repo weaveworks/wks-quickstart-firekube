@@ -361,6 +361,23 @@ git_deploy_key=""
 download="yes"
 download_force="no"
 
+setup_help() {
+    echo "
+    setup.sh
+
+    - ensure dependent binaries are available
+    - generate a cluster config
+    - bootstrap the gitops cluster
+    - push the changes to the remote for the cluster to pick up
+
+    optional flags:
+        --no-download                 Do not download dependent binaries
+        --force-download              Force downloading version-specific dependent binaries
+        --git-remote       string     Override the remote used for pushing changes and configuring the cluster
+        --git-deploy-key   filepath   Provide a deploy key for private/authenticated repo access
+        -h, -help                     Print this help text
+    "
+}
 while test $# -gt 0; do
     case "${1}" in
     --no-download)
@@ -374,7 +391,12 @@ while test $# -gt 0; do
         git_deploy_key="--git-deploy-key ${1}"
         log "Using git deploy key: ${1}"
         ;;
+    -h|--help)
+        setup_help
+        exit 0
+        ;;
     *)
+        setup_help
         error "unknown argument '${1}'"
         ;;
     esac
