@@ -7,8 +7,33 @@ JQ_VERSION=1.6.0
 FOOTLOOSE_VERSION=0.6.1
 IGNITE_VERSION=0.5.4
 WKSCTL_VERSION=0.8.0
-FOOTLOOSE_SERVER_ADDR=127.0.0.1:28496
 FOOTLOOSE_CLUSTER_NAME=firekube
+
+
+goos() {
+    local os=$(uname -s)
+    case $os in
+    Linux*)
+        echo linux;;
+    Darwin*)
+        echo darwin;;
+    *)
+        error "unknown OS: ${os}";;
+    esac
+}
+
+get_footloose_ip() {
+	case $(goos) in
+		darwin)
+			ifconfig $(netstat -rn | grep '^default' | head -1 | awk '{print $6}') | grep 'inet ' | awk '{print $2}'
+			;;
+		linux)
+			ip addr show $(netstat -rn | grep '^0.0.0.0' | awk '{print $8}') | grep 'inet ' | xargs | awk -F '[ ]|[/]' '{print $2}'
+			;;
+	esac
+}
+
+FOOTLOOSE_SERVER_ADDR=$(get_footloose_ip):28496
 
 log() {
     echo "•" $*
@@ -29,18 +54,6 @@ check_command() {
     if ! command_exists $cmd; then
         error "$cmd: command not found, please install $cmd."
     fi
-}
-
-goos() {
-    local os=$(uname -s)
-    case $os in
-    Linux*)
-        echo linux;;
-    Darwin*)
-        echo darwin;;
-    *)
-        error "unknown OS: ${os}";;
-    esac
 }
 
 arch() {
@@ -478,7 +491,7 @@ jk generate -f config.yaml -f $status setup.js
 rm -f $status $footloose_data
 
 log "Updating container images and git parameters"
-wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD)
+wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) --footloose-ip=$FOOTLOOSE_SERVER_ADDR
 
 # "Re-fix" controller image to use new image that calls out to footloose
 tmp=.image-swap.tmp
