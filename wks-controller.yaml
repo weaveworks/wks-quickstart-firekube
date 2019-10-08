@@ -40,6 +40,7 @@ spec:
       - effect: NoExecute
         key: node.alpha.kubernetes.io/unreachable
         operator: Exists
+      hostNetwork: true
       containers:
       - name: controller
         image: quay.io/wksctl/controller:footloose-scaling-c03bc8d8
