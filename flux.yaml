@@ -44,7 +44,7 @@ items:
   - kind: ServiceAccount
     name: flux
     namespace: weavek8sops
-- apiVersion: apps/v1beta1
+- apiVersion: apps/v1
   kind: Deployment
   metadata:
     name: memcached
@@ -88,7 +88,7 @@ items:
       targetPort: 11211
     selector:
       name: memcached
-- apiVersion: apps/v1beta1
+- apiVersion: apps/v1
   kind: Deployment
   metadata:
     name: flux
