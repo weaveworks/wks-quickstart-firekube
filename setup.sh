@@ -18,11 +18,11 @@ IGNITE_VERSION=0.5.5
 WKSCTL_VERSION=0.8.1
 
 log() {
-    echo "•" $*
+    echo "•" "$@"
 }
 
 error() {
-    log "error:" $*
+    log "error:" "$@"
     exit 1
 }
 
@@ -152,7 +152,7 @@ download() {
 help() {
     local cmd="${1}"
     shift
-    log "error: ${cmd}:" $*
+    log "error: ${cmd}:" "$@"
     echo
     eval "${cmd}_help"
     exit 1
@@ -337,6 +337,15 @@ git_http_url() {
     echo "${1}" | sed -e 's#^git@github.com:#https://github.com/#'
 }
 
+git_current_branch() {
+    # Fails when not on a branch unlike: `git name-rev --name-only HEAD`
+    git symbolic-ref --short HEAD
+}
+
+git_remote_fetchurl() {
+    git config --get "remote.${1}.url"
+}
+
 config_backend() {
     sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
 }
@@ -357,6 +366,14 @@ do_footloose() {
     fi
 }
 
+
+if git_current_branch > /dev/null 2>&1; then
+    log "Using git branch: $(git_current_branch)"
+else
+    error "Please checkout a git branch."
+fi
+
+git_remote="$(git config --get "branch.$(git_current_branch).remote" || true)" # fallback to "", user may override
 git_deploy_key=""
 download="yes"
 download_force="no"
@@ -386,6 +403,10 @@ while test $# -gt 0; do
     --force-download)
         download_force="yes"
         ;;
+    --git-remote)
+        shift
+        git_remote="${1}"
+        ;;
     --git-deploy-key)
         shift
         git_deploy_key="--git-deploy-key ${1}"
@@ -402,6 +423,21 @@ while test $# -gt 0; do
     esac
     shift
 done
+
+if [ "${git_remote}" ]; then
+    log "Using git remote: ${git_remote}"
+else
+    error "
+Please configure a remote for your current branch:
+    git branch --set-upstream-to <remote_name>/$(git_current_branch)
+
+Or use the --git-remote flag:
+    ./setup.sh --git-remote <remote_name>
+
+Your repo has the following remotes:
+$(git remote -v)"
+fi
+echo
 
 if [ "${download}" == "yes" ]; then
     mkdir -p "${HOME}/.wks/bin"
@@ -441,14 +477,14 @@ jk generate -f config.yaml -f "${status}" setup.js
 rm -f "${status}"
 
 log "Updating container images and git parameters"
-wksctl init --git-url="$(git_http_url "$(git config --get remote.origin.url)")" --git-branch="$(git rev-parse --abbrev-ref HEAD)"
+wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
-git push
+git push "${git_remote}" HEAD
 
 log "Installing Kubernetes cluster"
-wksctl apply --git-url="$(git_http_url "$(git config --get remote.origin.url)")" --git-branch="$(git rev-parse --abbrev-ref HEAD)" ${git_deploy_key}
+wksctl apply --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)" ${git_deploy_key}
 wksctl kubeconfig
