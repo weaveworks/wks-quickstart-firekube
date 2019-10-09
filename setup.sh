@@ -25,19 +25,24 @@ goos() {
 get_footloose_ip() {
 	case $(goos) in
 		darwin)
-			echo 192.168.51.1
-#			netstat -rn | grep '^default' | head -1 | awk '{print $2}'
+			octet=1
+			while (($octet < 100 && $(netstat -rn -f inet | awk -F '[ ]|[/]' '{print $1}' | grep 192.168.$octet.1 | wc -l) == 1)); do
+				octet=$(($octet + 1))
+			done
+			echo 192.168.$octet.1
 			;;
 		linux)
 			ip addr show $(netstat -rn | grep '^0.0.0.0' | awk '{print $8}') | grep 'inet ' | xargs | awk -F '[ ]|[/]' '{print $2}'
 			;;
+		*)
+			error "could not retrieve address"
 	esac
 }
 
 FOOTLOOSE_SERVER_ADDR=$(get_footloose_ip):28496
 
 if [ $(goos) == "darwin" ]; then
-	sudo ifconfig lo0 inet 192.168.51.1/24 add
+	sudo ifconfig lo0 inet $(get_footloose_ip)/24 add
 fi
 
 log() {
