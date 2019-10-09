@@ -150,3 +150,38 @@ version_check() {
         help "${cmd}" "Found version ${version} but ${req} is the minimum required version."
     fi
 }
+
+check_version() {
+    local cmd="${1}"
+    local req="${2}"
+
+    if ! command_exists "${cmd}" || [ "${download_force}" == "yes" ]; then
+        if [ "${download}" == "yes" ]; then
+            download "${cmd}" "${req}"
+        else
+            log "${cmd}: command not found"
+            eval "${cmd}_help"
+            exit 1
+        fi
+    fi
+
+    eval "${cmd}_version" "${req}"
+}
+
+git_ssh_url() {
+    echo "${1}" | sed -e 's#^https://github.com/#git@github.com:#'
+}
+
+git_http_url() {
+    echo "${1}" | sed -e 's#^git@github.com:#https://github.com/#'
+}
+
+git_current_branch() {
+    # Fails when not on a branch unlike: `git name-rev --name-only HEAD`
+    git symbolic-ref --short HEAD
+}
+
+git_remote_fetchurl() {
+    git config --get "remote.${1}.url"
+}
+

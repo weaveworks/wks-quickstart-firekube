@@ -24,43 +24,6 @@ FOOTLOOSE_VERSION=0.6.2
 IGNITE_VERSION=0.5.5
 WKSCTL_VERSION=0.8.1
 
-
-
-
-check_version() {
-    local cmd="${1}"
-    local req="${2}"
-
-    if ! command_exists "${cmd}" || [ "${download_force}" == "yes" ]; then
-        if [ "${download}" == "yes" ]; then
-            download "${cmd}" "${req}"
-        else
-            log "${cmd}: command not found"
-            eval "${cmd}_help"
-            exit 1
-        fi
-    fi
-
-    eval "${cmd}_version" "${req}"
-}
-
-git_ssh_url() {
-    echo "${1}" | sed -e 's#^https://github.com/#git@github.com:#'
-}
-
-git_http_url() {
-    echo "${1}" | sed -e 's#^git@github.com:#https://github.com/#'
-}
-
-git_current_branch() {
-    # Fails when not on a branch unlike: `git name-rev --name-only HEAD`
-    git symbolic-ref --short HEAD
-}
-
-git_remote_fetchurl() {
-    git config --get "remote.${1}.url"
-}
-
 config_backend() {
     sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
 }
@@ -80,7 +43,6 @@ do_footloose() {
         footloose "${@}"
     fi
 }
-
 
 if git_current_branch > /dev/null 2>&1; then
     log "Using git branch: $(git_current_branch)"
