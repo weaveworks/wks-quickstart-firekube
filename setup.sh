@@ -34,10 +34,8 @@ get_footloose_ip() {
 	case $(goos) in
 		darwin)
 			octet=1
-			while (($octet < 100 && $(unavailable $(possible_ip $octet)); do
+			while [ "$octet" -lt 100 ] && [ $(unavailable $(possible_ip $octet)) ]; do
 				octet=$(($octet + 1))
-			# while (($octet < 100 && $(netstat -rn -f inet | awk -F '[ ]|[/]' '{print $1}' | grep -s 192.168.$octet.1)); do
-			# 	octet=$(($octet + 1))
 			done
 			echo 192.168.$octet.1
 			;;
