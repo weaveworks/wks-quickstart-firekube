@@ -23,7 +23,7 @@ goos() {
 }
 
 unavailable() {
-	netstat -rn -f inet | awk -F '[ ]|[/]' '{print $1}' | grep -s $1 && ifconfig lo0 | grep -s -v $1
+	netstat -rn -f inet | awk -F '[ ]|[/]' '{print $1}' | grep -s $1 >/dev/null && ! ifconfig lo0 | grep -s -v $1 >/dev/null
 }
 
 possible_ip() {
