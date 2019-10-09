@@ -25,7 +25,8 @@ goos() {
 get_footloose_ip() {
 	case $(goos) in
 		darwin)
-			ifconfig $(netstat -rn | grep '^default' | head -1 | awk '{print $6}') | grep 'inet ' | awk '{print $2}'
+			echo 192.168.51.1
+#			netstat -rn | grep '^default' | head -1 | awk '{print $2}'
 			;;
 		linux)
 			ip addr show $(netstat -rn | grep '^0.0.0.0' | awk '{print $8}') | grep 'inet ' | xargs | awk -F '[ ]|[/]' '{print $2}'
@@ -34,6 +35,10 @@ get_footloose_ip() {
 }
 
 FOOTLOOSE_SERVER_ADDR=$(get_footloose_ip):28496
+
+if [ $(goos) == "darwin" ]; then
+	sudo ifconfig lo0 inet 192.168.51.1/24 add
+fi
 
 log() {
     echo "•" $*
