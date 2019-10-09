@@ -496,7 +496,7 @@ jk generate -f config.yaml -f $status setup.js
 rm -f $status $footloose_data
 
 log "Updating container images and git parameters"
-wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) --footloose-ip=$FOOTLOOSE_SERVER_ADDR
+wksctl init --git-url=$(git_ssh_url $(git config --get remote.origin.url)) --git-branch=$(git rev-parse --abbrev-ref HEAD) --footloose-ip=$FOOTLOOSE_SERVER_ADDR --backend=$(config_backend)
 
 # "Re-fix" controller image to use new image that calls out to footloose
 tmp=.image-swap.tmp
