@@ -3,17 +3,12 @@ unset CDPATH
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${SCRIPT_DIR}" || exit 1
 
-# shellcheck source=lib/functions.sh
-. "${SCRIPT_DIR}/lib/functions.sh"
+. lib/functions.sh
 
-# shellcheck source=lib/footloose.sh
-. "${SCRIPT_DIR}/lib/footloose.sh"
-# shellcheck source=lib/ignite.sh
-. "${SCRIPT_DIR}/lib/ignite.sh"
-# shellcheck source=lib/jk.sh
-. "${SCRIPT_DIR}/lib/jk.sh"
-# shellcheck source=lib/wksctl.sh
-. "${SCRIPT_DIR}/lib/wksctl.sh"
+. lib/footloose.sh
+. lib/ignite.sh
+. lib/jk.sh
+. lib/wksctl.sh
 
 # user-overrideable via ENV
 if command -v sudo >/dev/null 2>&1; then
