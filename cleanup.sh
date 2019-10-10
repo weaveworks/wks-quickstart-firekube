@@ -7,4 +7,4 @@ log() {
 }
 
 log "Deleting virtual machines"
-curl -XDELETE http://172.17.0.1:5555/api/clusters/firekube
+curl -XDELETE http://$(ps -ef | grep foot | grep -v grep | awk '{print $11}')/api/clusters/firekube
