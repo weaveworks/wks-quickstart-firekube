@@ -43,7 +43,7 @@ spec:
       hostNetwork: true
       containers:
       - name: controller
-        image: quay.io/wksctl/controller:footloose-scaling-c03bc8d8
+        image: quay.io/wksctl/controller:latest
         command:
         - /bin/controller
         - --verbose
