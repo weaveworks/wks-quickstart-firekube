@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 ignite_help() {
     echo "firekube with the ignite backend requires ignite to spawn VMs that will be used as Kubernetes nodes."
     echo ""

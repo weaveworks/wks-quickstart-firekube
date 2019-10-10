@@ -13,7 +13,7 @@ fi
 set -euo pipefail
 
 log() {
-    echo "•" $*
+    echo "•" "$@"
 }
 
 config_backend() {

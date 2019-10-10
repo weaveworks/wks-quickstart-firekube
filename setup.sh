@@ -3,12 +3,17 @@ unset CDPATH
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd "${SCRIPT_DIR}" || exit 1
 
-. ${SCRIPT_DIR}/lib/functions.sh
+# shellcheck source=lib/functions.sh
+. "${SCRIPT_DIR}/lib/functions.sh"
 
-. ${SCRIPT_DIR}/lib/footloose.sh
-. ${SCRIPT_DIR}/lib/ignite.sh
-. ${SCRIPT_DIR}/lib/jk.sh
-. ${SCRIPT_DIR}/lib/wksctl.sh
+# shellcheck source=lib/footloose.sh
+. "${SCRIPT_DIR}/lib/footloose.sh"
+# shellcheck source=lib/ignite.sh
+. "${SCRIPT_DIR}/lib/ignite.sh"
+# shellcheck source=lib/jk.sh
+. "${SCRIPT_DIR}/lib/jk.sh"
+# shellcheck source=lib/wksctl.sh
+. "${SCRIPT_DIR}/lib/wksctl.sh"
 
 # user-overrideable via ENV
 if command -v sudo >/dev/null 2>&1; then
@@ -163,5 +168,5 @@ git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push "${git_remote}" HEAD
 
 log "Installing Kubernetes cluster"
-wksctl apply --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)" ${git_deploy_key}
+wksctl apply --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)" "${git_deploy_key}"
 wksctl kubeconfig
