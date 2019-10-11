@@ -86,7 +86,7 @@ while test $# -gt 0; do
         ;;
     --git-deploy-key)
         shift
-        git_deploy_key="--git-deploy-key ${1}"
+        git_deploy_key="--git-deploy-key=${1}"
         log "Using git deploy key: ${1}"
         ;;
     -h|--help)
@@ -163,5 +163,10 @@ git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push "${git_remote}" HEAD
 
 log "Installing Kubernetes cluster"
-wksctl apply --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)" "${git_deploy_key}"
+apply_args=(
+  "--git-url=$(git_http_url "$(git_remote_fetchurl "${git_remote}")")"
+  "--git-branch=$(git_current_branch)"
+)
+[ "${git_deploy_key}" ] && apply_args+=("${git_deploy_key}")
+wksctl apply "${apply_args[@]}"
 wksctl kubeconfig
