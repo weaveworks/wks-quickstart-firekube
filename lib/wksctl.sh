@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 
 wksctl_help() {
     echo "firekube needs wksctl to install Kubernetes."

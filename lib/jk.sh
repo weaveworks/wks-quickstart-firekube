@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 
 jk_help() {
     echo "firekube needs jk to generate configuration manifests."
