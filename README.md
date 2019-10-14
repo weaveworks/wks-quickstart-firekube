@@ -19,6 +19,8 @@ containers.
 push an initial commit to your fork:
 
    ```console
+   export user="" # Your GitHub handle or org
+
    git clone git@github.com:$user/wks-quickstart-firekube.git
    cd wks-quickstart-firekube
    ```
@@ -30,6 +32,9 @@ push an initial commit to your fork:
    ```
 
    This step will take several minutes.
+
+   **Please note** that the `setup.sh` script will detect which OS you're on.
+   If it's macOS, the script will automatically set `backend: docker` inside `config.yaml`. This config is to start the cluster in containers as there is no KVM on macOS. However, Firekube on Linux will run either with `backend: ignite` (ignite VMs) or `backend: docker` (containers). So the `setup.sh` script won't touch the backend value inside `config.yaml` if you're on Linux. In case you started Firekube (in containers) on macOS then switched to try it on Linux, please make sure that the backend value is set to `backend: ignite` so that you can start the cluster on ignite / firecracker VMs.
 
 1. Export the `KUBECONFIG` environment variable as indicated at the end of the installation:
 
@@ -132,11 +137,14 @@ To use a private git repository instead of a fork of `wks-quickstart-firekube`:
 
 ## Getting Help
 
-If you have any questions about, feedback for or problems with `wksctl`:
+If you have any questions about, feedback for or problems with `wks-quickstart-firekube`:
 
 - Invite yourself to the <a href="https://slack.weave.works/" target="_blank">Weave Users Slack</a>.
 - Ask a question on the [#general](https://weave-community.slack.com/messages/general/) slack channel.
 - [File an issue](https://github.com/weaveworks/wks-quickstart-firekube/issues/new).
+- Join the discussion
+  - Invite yourself to the <a href="https://slack.weave.works/" target="_blank">Weave community</a> Slack
+  - Ask a question on the [#firekube](https://weave-community.slack.com/messages/firekube/) Slack channel
 
 Your feedback is always welcome!
 
