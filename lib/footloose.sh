@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 footloose_help() {
     echo "firekube requires footloose to spawn VMs that will be used as Kubernetes nodes."
     echo ""

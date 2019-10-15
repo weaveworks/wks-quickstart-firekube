@@ -1,3 +1,5 @@
+# shellcheck shell=bash
+
 log() {
     echo "•" "$@"
 }
@@ -105,22 +107,21 @@ version_lt() {
     local b
     b="$(clean_version "${2}")"
 
-    VERSION_MAJOR="${a%.*.*}"
-    REST="${a%.*}" VERSION_MINOR="${REST#*.}"
-    VERSION_PATCH="${a#*.*.}"
+    A_MAJOR="${a%.*.*}"
+    REST="${a%.*}" A_MINOR="${REST#*.}"
+    A_PATCH="${a#*.*.}"
 
-    MIN_VERSION_MAJOR="${b%.*.*}"
-    REST="${b%.*}" MIN_VERSION_MINOR="${REST#*.}"
-    MIN_VERSION_PATCH="${b#*.*.}"
+    B_MAJOR="${b%.*.*}"
+    REST="${b%.*}" B_MINOR="${REST#*.}"
+    B_PATCH="${b#*.*.}"
 
-    if [ \( "${VERSION_MAJOR}" -lt "${MIN_VERSION_MAJOR}" \) -o \
-        \( "${VERSION_MAJOR}" -eq "${MIN_VERSION_MAJOR}" -a \
-        \( "${VERSION_MINOR}" -lt "${MIN_VERSION_MINOR}" -o \
-        \( "${VERSION_MINOR}" -eq "${MIN_VERSION_MINOR}" -a \
-        \( "${VERSION_PATCH}" -lt "${MIN_VERSION_PATCH}" \) \) \) \) ] ; then
-        return 0
-    fi
-    return 1
+    [ "${A_MAJOR}" -lt "${B_MAJOR}" ] && return 0
+    [ "${A_MAJOR}" -gt "${B_MAJOR}" ] && return 1
+
+    [ "${A_MINOR}" -lt "${B_MINOR}" ] && return 0
+    [ "${A_MINOR}" -gt "${B_MINOR}" ] && return 1
+
+    [ "${A_PATCH}" -lt "${B_PATCH}" ]
 }
 
 download() {
@@ -169,10 +170,12 @@ check_version() {
 }
 
 git_ssh_url() {
+    # shellcheck disable=SC2001
     echo "${1}" | sed -e 's#^https://github.com/#git@github.com:#'
 }
 
 git_http_url() {
+    # shellcheck disable=SC2001
     echo "${1}" | sed -e 's#^git@github.com:#https://github.com/#'
 }
 
