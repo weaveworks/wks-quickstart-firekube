@@ -95,6 +95,17 @@ do_curl_tarball() {
     rm -rf "${dldir}"
 }
 
+do_sudo() {
+    # user-overrideable via ENV
+    if command -v sudo >/dev/null 2>&1; then
+        sudo="${sudo:-"sudo"}"
+    else
+        sudo="${sudo}"
+    fi
+
+    "${sudo}" "${@}"
+}
+
 clean_version() {
     echo "${1}" | sed -n -e 's#^\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*#\1#p'
 }

@@ -45,3 +45,23 @@ footloose_version() {
 
     version_check "${cmd}" "${version}" "${req}"
 }
+
+footloose_get_config_backend() {
+    sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
+}
+
+footloose_set_config_backend() {
+    local tmp=.config.yaml.tmp
+
+    sed -e "s/^backend: .*$/backend: ${1}/" config.yaml > "${tmp}" && \
+        mv "${tmp}" config.yaml && \
+        rm -f "${tmp}"
+}
+
+footloose_do() {
+    if [ "$(footloose_get_config_backend)" == "ignite" ]; then
+        do_sudo env "PATH=${PATH}" footloose "${@}"
+    else
+        footloose "${@}"
+    fi
+}

@@ -10,39 +10,12 @@ cd "${SCRIPT_DIR}" || exit 1
 . lib/jk.sh
 . lib/wksctl.sh
 
-# user-overrideable via ENV
-if command -v sudo >/dev/null 2>&1; then
-    sudo="${sudo:-"sudo"}"
-else
-    sudo="${sudo}"
-fi
-
 set -euo pipefail
 
 JK_VERSION=0.3.0
 FOOTLOOSE_VERSION=0.6.2
 IGNITE_VERSION=0.5.5
 WKSCTL_VERSION=0.8.1
-
-config_backend() {
-    sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
-}
-
-set_config_backend() {
-    local tmp=.config.yaml.tmp
-
-    sed -e "s/^backend: .*$/backend: ${1}/" config.yaml > "${tmp}" && \
-        mv "${tmp}" config.yaml && \
-        rm -f "${tmp}"
-}
-
-do_footloose() {
-    if [ "$(config_backend)" == "ignite" ]; then
-        $sudo env "PATH=${PATH}" footloose "${@}"
-    else
-        footloose "${@}"
-    fi
-}
 
 if git_current_branch > /dev/null 2>&1; then
     log "Using git branch: $(git_current_branch)"
@@ -123,13 +96,13 @@ fi
 
 # On macOS, we only support the docker backend.
 if [ "$(goos)" == "darwin" ]; then
-    set_config_backend docker
+    footloose_set_config_backend docker
 fi
 
 check_command docker
 check_version jk "${JK_VERSION}"
 check_version footloose "${FOOTLOOSE_VERSION}"
-if [ "$(config_backend)" == "ignite" ]; then
+if [ "$(footloose_get_config_backend)" == "ignite" ]; then
     check_version ignite "${IGNITE_VERSION}"
 fi
 check_version wksctl "${WKSCTL_VERSION}"
@@ -145,11 +118,11 @@ if [ ! -f "${cluster_key}" ]; then
 fi
 
 log "Creating virtual machines"
-do_footloose create
+footloose_do create
 
 log "Creating Cluster API manifests"
 status="footloose-status.yaml"
-do_footloose status -o json > "${status}"
+footloose_do status -o json > "${status}"
 jk generate -f config.yaml -f "${status}" setup.js
 rm -f "${status}"
 
