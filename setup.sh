@@ -91,8 +91,8 @@ FOOTLOOSE_VERSION=0.6.2
 IGNITE_VERSION=0.5.5
 WKSCTL_VERSION=0.8.1
 
-# On macOS, we only support the docker backend.
-if [ "$(goos)" == "darwin" ]; then
+# On non-Linux (incl. MacOS), we only support the docker backend.
+if [ "$(goos)" != "linux" ]; then
     footloose_set_config_backend docker
 fi
 
