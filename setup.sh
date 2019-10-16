@@ -12,12 +12,6 @@ cd "${SCRIPT_DIR}" || exit 1
 
 set -euo pipefail
 
-if git_current_branch > /dev/null 2>&1; then
-    log "Using git branch: $(git_current_branch)"
-else
-    error "Please checkout a git branch."
-fi
-
 setup_help() {
     echo "
     setup.sh
@@ -63,6 +57,13 @@ while test $# -gt 0; do
     esac
     shift
 done
+
+# Validations
+if git_current_branch > /dev/null 2>&1; then
+    log "Using git branch: $(git_current_branch)"
+else
+    error "Please checkout a git branch."
+fi
 
 if [ "${git_remote}" ]; then
     log "Using git remote: ${git_remote}"
