@@ -23,7 +23,7 @@ else
     error "Please checkout a git branch."
 fi
 
-git_remote="$(git config --get "branch.$(git_current_branch).remote" || true)" # fallback to "", user may override
+git_remote="$(git_remote_for_branch "$(git_current_branch)")"
 git_deploy_key=""
 download="yes"
 download_force="no"

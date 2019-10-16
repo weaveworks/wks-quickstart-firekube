@@ -195,6 +195,11 @@ git_current_branch() {
     git symbolic-ref --short HEAD
 }
 
+git_remote_for_branch() {
+  branch="${1}"
+  git config --get "branch.${branch}.remote" || true
+}
+
 git_remote_fetchurl() {
     git config --get "remote.${1}.url"
 }
