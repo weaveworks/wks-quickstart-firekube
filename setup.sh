@@ -99,9 +99,7 @@ fi
 check_command docker
 check_version jk "${JK_VERSION}"
 check_version footloose "${FOOTLOOSE_VERSION}"
-if [ "$(footloose_get_config_backend)" == "ignite" ]; then
-    check_version ignite "${IGNITE_VERSION}"
-fi
+[ "$(footloose_get_config_backend)" != "ignite" ] || check_version ignite "${IGNITE_VERSION}"
 check_version wksctl "${WKSCTL_VERSION}"
 
 log "Creating footloose manifest"
