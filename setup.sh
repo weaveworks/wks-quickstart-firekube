@@ -81,18 +81,15 @@ fi
 echo
 
 # Constants
+PATH="${HOME}/.wks/bin:${PATH}"
+git_remote="$(git_remote_for_branch "$(git_current_branch)")"
+download="yes"
+export PATH git_remote download
+
 JK_VERSION=0.3.0
 FOOTLOOSE_VERSION=0.6.2
 IGNITE_VERSION=0.5.5
 WKSCTL_VERSION=0.8.1
-
-git_remote="$(git_remote_for_branch "$(git_current_branch)")"
-download="yes"
-
-if [ "${download}" == "yes" ]; then
-    mkdir -p "${HOME}/.wks/bin"
-    export PATH="${HOME}/.wks/bin:${PATH}"
-fi
 
 # On macOS, we only support the docker backend.
 if [ "$(goos)" == "darwin" ]; then

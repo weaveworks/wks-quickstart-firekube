@@ -79,6 +79,7 @@ do_curl_binary() {
     local cmd="${1}"
     local url="${2}"
 
+    mkdir -p "${HOME}/.wks/bin"
     do_curl "${HOME}/.wks/bin/${cmd}" "${url}"
     chmod +x "${HOME}/.wks/bin/${cmd}"
 }
@@ -89,6 +90,7 @@ do_curl_tarball() {
 
     dldir="$(mktempdir)"
     mkdir "${dldir}/${cmd}"
+    mkdir -p "${HOME}/.wks/bin"
     do_curl "${dldir}/${cmd}.tar.gz" "${url}"
     tar -C "${dldir}/${cmd}" -xvf "${dldir}/${cmd}.tar.gz"
     mv "${dldir}/${cmd}/${cmd}" "${HOME}/.wks/bin/${cmd}"
