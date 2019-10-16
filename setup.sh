@@ -12,21 +12,11 @@ cd "${SCRIPT_DIR}" || exit 1
 
 set -euo pipefail
 
-JK_VERSION=0.3.0
-FOOTLOOSE_VERSION=0.6.2
-IGNITE_VERSION=0.5.5
-WKSCTL_VERSION=0.8.1
-
 if git_current_branch > /dev/null 2>&1; then
     log "Using git branch: $(git_current_branch)"
 else
     error "Please checkout a git branch."
 fi
-
-git_remote="$(git_remote_for_branch "$(git_current_branch)")"
-git_deploy_key=""
-download="yes"
-download_force="no"
 
 setup_help() {
     echo "
@@ -88,6 +78,15 @@ Your repo has the following remotes:
 $(git remote -v)"
 fi
 echo
+
+# Constants
+JK_VERSION=0.3.0
+FOOTLOOSE_VERSION=0.6.2
+IGNITE_VERSION=0.5.5
+WKSCTL_VERSION=0.8.1
+
+git_remote="$(git_remote_for_branch "$(git_current_branch)")"
+download="yes"
 
 if [ "${download}" == "yes" ]; then
     mkdir -p "${HOME}/.wks/bin"
