@@ -58,6 +58,20 @@ while test $# -gt 0; do
     shift
 done
 
+# Constants
+PATH="${HOME}/.wks/bin:${PATH}"
+download="${download:="yes"}"
+download_force="${download_force:="no"}"
+export PATH download force_download
+
+JK_VERSION=0.3.0
+FOOTLOOSE_VERSION=0.6.2
+IGNITE_VERSION=0.5.5
+WKSCTL_VERSION=0.8.1
+cluster_key=${cluster_key:-"cluster-key"}
+git_remote="${git_remote:-$(git_remote_for_branch "$(git_current_branch)")}"
+git_deploy_key="${git_deploy_key:-""}"
+
 # Validations
 if git_current_branch > /dev/null 2>&1; then
     log "Using git branch: $(git_current_branch)"
@@ -79,19 +93,6 @@ Your repo has the following remotes:
 $(git remote -v)"
 fi
 echo
-
-# Constants
-PATH="${HOME}/.wks/bin:${PATH}"
-git_remote="$(git_remote_for_branch "$(git_current_branch)")"
-download="${download:="yes"}"
-download_force="${download_force:="no"}"
-export PATH git_remote download force_download
-
-JK_VERSION=0.3.0
-FOOTLOOSE_VERSION=0.6.2
-IGNITE_VERSION=0.5.5
-WKSCTL_VERSION=0.8.1
-cluster_key=${cluster_key:-"cluster-key"}
 
 # On non-Linux (incl. MacOS), we only support the docker backend.
 if [ "$(goos)" != "linux" ]; then
