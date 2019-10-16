@@ -206,3 +206,12 @@ git_remote_fetchurl() {
     git config --get "remote.${1}.url"
 }
 
+ssh_keygen_unless_exists() {
+    cluster_key="${1}"
+
+    [ -f "${cluster_key}" ] && return 0
+
+    # Create the cluster ssh key with the user credentials.
+    log "Creating SSH key"
+    ssh-keygen -q -t rsa -b 4096 -C firekube@footloose.mail -f "${cluster_key}" -N ""
+}

@@ -83,13 +83,15 @@ echo
 # Constants
 PATH="${HOME}/.wks/bin:${PATH}"
 git_remote="$(git_remote_for_branch "$(git_current_branch)")"
-download="yes"
-export PATH git_remote download
+download="${download:="yes"}"
+download_force="${download_force:="no"}"
+export PATH git_remote download force_download
 
 JK_VERSION=0.3.0
 FOOTLOOSE_VERSION=0.6.2
 IGNITE_VERSION=0.5.5
 WKSCTL_VERSION=0.8.1
+cluster_key=${cluster_key:-"cluster-key"}
 
 # On non-Linux (incl. MacOS), we only support the docker backend.
 if [ "$(goos)" != "linux" ]; then
@@ -105,28 +107,20 @@ check_version wksctl "${WKSCTL_VERSION}"
 log "Creating footloose manifest"
 jk generate -f config.yaml setup.js
 
-cluster_key="cluster-key"
-if [ ! -f "${cluster_key}" ]; then
-    # Create the cluster ssh key with the user credentials.
-    log "Creating SSH key"
-    ssh-keygen -q -t rsa -b 4096 -C firekube@footloose.mail -f ${cluster_key} -N ""
-fi
+log "Creating SSH key '${cluster_key}' if it doesn't exist"
+ssh_keygen_unless_exists "${cluster_key}"
 
 log "Creating virtual machines"
 footloose_do create
 
 log "Creating Cluster API manifests"
-status="footloose-status.yaml"
-footloose_do status -o json > "${status}"
-jk generate -f config.yaml -f "${status}" setup.js
-rm -f "${status}"
+jk generate -f config.yaml -f <(footloose_do status -o json) setup.js
 
 log "Updating container images and git parameters"
 wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
-
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
 git push "${git_remote}" HEAD
 
