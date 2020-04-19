@@ -114,13 +114,13 @@ items:
     name: podinfo
     namespace: default
   spec:
-    maxReplicas: 4
+    maxReplicas: 2
     metrics:
     - resource:
         name: cpu
         targetAverageUtilization: 99
       type: Resource
-    minReplicas: 2
+    minReplicas: 1
     scaleTargetRef:
       apiVersion: apps/v1
       kind: Deployment
