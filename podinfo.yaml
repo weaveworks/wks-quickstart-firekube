@@ -114,7 +114,7 @@ items:
     name: podinfo
     namespace: default
   spec:
-    maxReplicas: 2
+    maxReplicas: 1
     metrics:
     - resource:
         name: cpu
