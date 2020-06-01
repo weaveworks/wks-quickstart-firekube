@@ -9,8 +9,24 @@
 #            https://github.com/weaveworks/ignite.
 backend: ignite
 
-# Number of nodes allocated for the Kubernetes control plane and workers.
-controlPlane:
-  nodes: 1
-workers:
-  nodes: 1
+cluster:
+  name: firekube
+  namespace: weavek8sops
+  # Quantiy and details of nodes allocated for the Kubernetes control plane and workers.
+  cpus: 2
+  memory: 1GB
+  diskSize: 5GB
+  controlPlane:
+    nodes: 1
+  workers:
+    nodes: 3
+versions: 
+  kubelet: 1.16.9
+  jk: 0.4.0
+  footloose: 0.6.3
+  ignite: 0.6.3
+  wksctl: 0.8.2-beta.6
+images:
+  footloose: quay.io/footloose/centos7:0.6.3
+  ignite: weaveworks/ignite-centos:7
+  kernel: weaveworks/ignite-kernel:4.19.47

@@ -1,7 +1,7 @@
 apiVersion: cluster.k8s.io/v1alpha1
 kind: Cluster
 metadata:
-  name: example
+  name: weavek8sops
 spec:
   clusterNetwork:
     services:
@@ -25,6 +25,10 @@ spec:
             configmap: repo
             key: docker-ce.repo
           destination: /etc/yum.repos.d/docker-ce.repo
+        # - source:
+        #     configmap: repo
+        #     key: cloud-google-com.gpg.b64
+        #   destination: /tmp/cloud-google-com.gpg.b64
         - source:
             configmap: docker
             key: daemon.json
@@ -32,5 +36,4 @@ spec:
       cri:
         kind: docker
         package: docker-ce
-        version: 18.09.7
-
+        version: 19.03.8

@@ -19,13 +19,20 @@ fi
 
 set -euo pipefail
 
-JK_VERSION=0.3.0
-FOOTLOOSE_VERSION=0.6.2
-IGNITE_VERSION=0.5.5
-WKSCTL_VERSION=0.8.1
-
-config_backend() {
-    sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
+parse_yaml() {
+   local prefix=$2
+   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
+   sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
+        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
+   awk -F$fs '{
+      indent = length($1)/2;
+      vname[indent] = $2;
+      for (i in vname) {if (i > indent) {delete vname[i]}}
+      if (length($3) > 0) {
+         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
+         printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
+      }
+   }'
 }
 
 set_config_backend() {
@@ -36,8 +43,15 @@ set_config_backend() {
         rm -f "${tmp}"
 }
 
+eval $(parse_yaml config.yaml "config_")
+
+# On macOS, we only support the docker backend.
+if [ "$(goos)" == "darwin" ]; then
+    set_config_backend docker
+fi
+
 do_footloose() {
-    if [ "$(config_backend)" == "ignite" ]; then
+    if [ "$config_backend" == "ignite" ]; then
         $sudo env "PATH=${PATH}" footloose "${@}"
     else
         footloose "${@}"
@@ -121,20 +135,15 @@ if [ "${download}" == "yes" ]; then
     export PATH="${HOME}/.wks/bin:${PATH}"
 fi
 
-# On macOS, we only support the docker backend.
-if [ "$(goos)" == "darwin" ]; then
-    set_config_backend docker
-fi
-
 check_command docker
-check_version jk "${JK_VERSION}"
-check_version footloose "${FOOTLOOSE_VERSION}"
-if [ "$(config_backend)" == "ignite" ]; then
-    check_version ignite "${IGNITE_VERSION}"
+check_version jk "${config_versions_jk}"
+check_version footloose "${config_versions_footloose}"
+if [ "$config_backend" == "ignite" ]; then
+    check_version ignite "${config_versions_ignite}"
 fi
-check_version wksctl "${WKSCTL_VERSION}"
+check_version wksctl "${config_versions_wksctl}"
 
-log "Creating footloose manifest"
+log "Creating footloose manifests"
 jk generate -f config.yaml setup.js
 
 cluster_key="cluster-key"
@@ -147,14 +156,16 @@ fi
 log "Creating virtual machines"
 do_footloose create
 
+# The machines yaml is created using data from the footloose status json and the config.yaml
 log "Creating Cluster API manifests"
-status="footloose-status.yaml"
+status="footloose-status.json"
 do_footloose status -o json > "${status}"
 jk generate -f config.yaml -f "${status}" setup.js
 rm -f "${status}"
 
 log "Updating container images and git parameters"
 wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
+# FIXME: Script bails around the "wksctl init" step
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
@@ -168,5 +179,6 @@ apply_args=(
   "--git-branch=$(git_current_branch)"
 )
 [ "${git_deploy_key}" ] && apply_args+=("${git_deploy_key}")
-wksctl apply "${apply_args[@]}"
+# wksctl apply "${apply_args[@]}"
+wksctl apply #--verbose
 wksctl kubeconfig
