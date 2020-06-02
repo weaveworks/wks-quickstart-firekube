@@ -19,6 +19,12 @@ const backend = {
   },
   ignite: {
     image: config.images.ignite,
+    ignite: {
+      cpus: config.cluster.cpus,
+      memory: config.cluster.memory,
+      diskSize: config.cluster.diskSize,
+      kernel: config.images.kernel,
+    }, 
     privileged: false,
     volumes: [],
   },
@@ -27,6 +33,7 @@ const backend = {
 const image = config => backend[config.backend].image;
 const privileged = config => backend[config.backend].privileged;
 const volumes = config => backend[config.backend].volumes;
+const ignite = config => backend[config.backend].ignite;
 
 const footloose = config => ({
   cluster: {
@@ -36,15 +43,10 @@ const footloose = config => ({
   machines: [{
     count: numNodes(config),
     spec: {
+      name: 'node%d',
       image: image(config),
       backend: config.backend,
-      name: 'node%d',
-      ignite: {
-        cpus: config.cluster.cpus,
-        memory: config.cluster.memory,
-        diskSize: config.cluster.diskSize,
-        kernel: config.images.kernel,
-      }, 
+      ignite: ignite(config),
       portMappings: [{
         containerPort: 22,
         hostPort: 2222,
