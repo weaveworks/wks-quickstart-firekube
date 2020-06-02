@@ -18,7 +18,13 @@ const backend = {
     }]
   },
   ignite: {
-    image: 'weaveworks/ignite-centos:firekube-pre3',
+    image: config.images.ignite,
+    ignite: {
+      cpus: config.cluster.cpus,
+      memory: config.cluster.memory,
+      diskSize: config.cluster.diskSize,
+      kernel: config.images.kernel,
+    }, 
     privileged: false,
     volumes: [],
   },
@@ -27,6 +33,7 @@ const backend = {
 const image = config => backend[config.backend].image;
 const privileged = config => backend[config.backend].privileged;
 const volumes = config => backend[config.backend].volumes;
+const ignite = config => backend[config.backend].ignite;
 
 const footloose = config => ({
   cluster: {
@@ -36,15 +43,10 @@ const footloose = config => ({
   machines: [{
     count: numNodes(config),
     spec: {
-      image: image(config),
       name: 'node%d',
+      image: image(config),
       backend: config.backend,
-      ignite: {
-        cpus: 2,
-        memory: '1GB',
-        diskSize: '5GB',
-        kernel: 'weaveworks/ignite-kernel:4.19.47',
-      },
+      ignite: ignite(config),
       portMappings: [{
         containerPort: 22,
         hostPort: 2222,
