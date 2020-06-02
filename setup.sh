@@ -179,6 +179,6 @@ apply_args=(
   "--git-branch=$(git_current_branch)"
 )
 [ "${git_deploy_key}" ] && apply_args+=("${git_deploy_key}")
-# wksctl apply "${apply_args[@]}"
-wksctl apply #--verbose
+wksctl apply "${apply_args[@]}"
+# wksctl apply --verbose # For testng
 wksctl kubeconfig
