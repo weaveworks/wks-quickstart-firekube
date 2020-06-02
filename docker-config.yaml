@@ -11,6 +11,6 @@ data:
         "max-size": "100m"
       },
       "exec-opts": [
-        "native.cgroupdriver=cgroupfs"
+        "native.cgroupdriver=systemd"
       ]
     }
