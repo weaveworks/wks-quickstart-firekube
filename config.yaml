@@ -21,12 +21,14 @@ cluster:
   workers:
     nodes: 3
 versions: 
-  kubelet: 1.16.9
+  # kubelet: 1.18.3
+  kubelet: 1.17.5
   jk: 0.4.0
   footloose: 0.6.3
-  ignite: 0.6.3
-  wksctl: 0.8.2-beta.6
+  ignite: 0.7.0
+  wksctl: 0.8.2-beta.7
 images:
   footloose: quay.io/footloose/centos7:0.6.3
   ignite: weaveworks/ignite-centos:7
-  kernel: weaveworks/ignite-kernel:4.19.47
+  # kernel: weaveworks/ignite-kernel:5.4.43
+  kernel: weaveworks/ignite-kernel:4.19.125
