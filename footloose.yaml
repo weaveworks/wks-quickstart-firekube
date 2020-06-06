@@ -2,13 +2,13 @@ cluster:
   name: firekube
   privateKey: cluster-key
 machines:
-- count: 4
+- count: 3
   spec:
     backend: ignite
     ignite:
       cpus: 2
       diskSize: 5GB
-      kernel: weaveworks/ignite-kernel:4.19.125
+      kernel: weaveworks/ignite-kernel:5.4.43
       memory: 1GB
     image: weaveworks/ignite-centos:7
     name: node%d

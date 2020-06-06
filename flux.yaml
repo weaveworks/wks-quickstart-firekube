@@ -63,7 +63,7 @@ items:
         - args:
           - -m 64
           - -p 11211
-          image: memcached:1.4.25
+          image: memcached:1.6.6
           imagePullPolicy: IfNotPresent
           name: memcached
           ports:
@@ -120,7 +120,7 @@ items:
           - --listen-metrics=:3031
           - --sync-garbage-collection
           - --manifest-generation=true
-          image: fluxcd/flux:1.14.2
+          image: fluxcd/flux:1.19.0
           imagePullPolicy: IfNotPresent
           name: flux
           ports:

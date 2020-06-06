@@ -13,7 +13,7 @@ items:
         apiVersion: baremetalproviderspec/v1alpha1
         kind: BareMetalMachineProviderSpec
         private:
-          address: 10.61.0.18
+          address: 10.61.0.34
           port: 22
         public:
           address: 127.0.0.1
@@ -33,7 +33,7 @@ items:
         apiVersion: baremetalproviderspec/v1alpha1
         kind: BareMetalMachineProviderSpec
         private:
-          address: 10.61.0.19
+          address: 10.61.0.35
           port: 22
         public:
           address: 127.0.0.1
@@ -53,31 +53,11 @@ items:
         apiVersion: baremetalproviderspec/v1alpha1
         kind: BareMetalMachineProviderSpec
         private:
-          address: 10.61.0.20
+          address: 10.61.0.36
           port: 22
         public:
           address: 127.0.0.1
           port: 2224
-    versions:
-      kubelet: 1.17.5
-- apiVersion: cluster.k8s.io/v1alpha1
-  kind: Machine
-  metadata:
-    labels:
-      set: worker
-    name: worker-2
-    namespace: weavek8sops
-  spec:
-    providerSpec:
-      value:
-        apiVersion: baremetalproviderspec/v1alpha1
-        kind: BareMetalMachineProviderSpec
-        private:
-          address: 10.61.0.21
-          port: 22
-        public:
-          address: 127.0.0.1
-          port: 2225
     versions:
       kubelet: 1.17.5
 kind: List
