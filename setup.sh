@@ -19,44 +19,17 @@ fi
 
 set -euo pipefail
 
-parse_yaml() {
-   local prefix=$2
-   local s='[[:space:]]*' w='[a-zA-Z0-9_]*' fs=$(echo @|tr @ '\034')
-   sed -ne "s|^\($s\)\($w\)$s:$s\"\(.*\)\"$s\$|\1$fs\2$fs\3|p" \
-        -e "s|^\($s\)\($w\)$s:$s\(.*\)$s\$|\1$fs\2$fs\3|p"  $1 |
-   awk -F$fs '{
-      indent = length($1)/2;
-      vname[indent] = $2;
-      for (i in vname) {if (i > indent) {delete vname[i]}}
-      if (length($3) > 0) {
-         vn=""; for (i=0; i<indent; i++) {vn=(vn)(vname[i])("_")}
-         printf("%s%s%s=\"%s\"\n", "'$prefix'", vn, $2, $3);
-      }
-   }'
-}
-
-set_config_backend() {
-    local tmp=.config.yaml.tmp
-
-    sed -e "s/^backend: .*$/backend: ${1}/" config.yaml > "${tmp}" && \
-        mv "${tmp}" config.yaml && \
-        rm -f "${tmp}"
-}
-
-eval $(parse_yaml config.yaml "config_")
-
 # On macOS, we only support the docker backend.
 if [ "$(goos)" == "darwin" ]; then
     set_config_backend docker
 fi
 
-do_footloose() {
-    if [ "$config_backend" == "ignite" ]; then
-        $sudo env "PATH=${PATH}" footloose "${@}"
-    else
-        footloose "${@}"
-    fi
-}
+# Parse all the config values after checking for macOS
+eval $(parse_yaml config.yaml "config_")
+
+# Update the flux, memcached, and wksctl versions using config values
+set_flux_version ${config_images_memcached} ${config_images_flux}
+set_wksctl_version ${config_images_wksctl}
 
 if git_current_branch > /dev/null 2>&1; then
     log "Using git branch: $(git_current_branch)"
@@ -164,8 +137,7 @@ jk generate -f config.yaml -f "${status}" setup.js
 rm -f "${status}"
 
 log "Updating container images and git parameters"
-wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
-# FIXME: Script bails around the "wksctl init" step
+wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)" &
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
