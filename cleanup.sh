@@ -29,3 +29,8 @@ do_footloose() {
 log "Deleting virtual machines"
 export PATH=~/.wks/bin:${PATH}
 do_footloose delete
+
+# Especially as it relates to ignite machines, we may need to remove because `wksctl apply` 
+# will otherwise fail. This is due to footloose IPs inrementing using CNI bridge IPAM:
+#  sudo cat /var/lib/cni/networks/ignite-cni-bridge/last_reserved_ip.0
+rm machines.yaml footloose.yaml
