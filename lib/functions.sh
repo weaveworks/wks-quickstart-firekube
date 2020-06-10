@@ -232,6 +232,10 @@ set_flux_version() {
         sub(/image.*/, repl) } 1' flux.yaml > "${tmp}" && \
         mv "${tmp}" flux.yaml && \
         rm -f "${tmp}"
+    awk -v repl="git-url=${3}" '/git-url=/ {
+        sub(/git-url=.*/, repl) } 1' flux.yaml > "${tmp}" && \
+        mv "${tmp}" flux.yaml && \
+        rm -f "${tmp}"
 }
 
 do_footloose() {

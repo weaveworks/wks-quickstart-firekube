@@ -27,10 +27,6 @@ fi
 # Parse all the config values after checking for macOS
 eval $(parse_yaml config.yaml "config_")
 
-# Update the flux, memcached, and wksctl versions using config values
-set_flux_version ${config_images_memcached} ${config_images_flux}
-set_wksctl_version ${config_images_wksctl}
-
 if git_current_branch > /dev/null 2>&1; then
     log "Using git branch: $(git_current_branch)"
 else
@@ -137,7 +133,9 @@ jk generate -f config.yaml -f "${status}" setup.js
 rm -f "${status}"
 
 log "Updating container images and git parameters"
-wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)" &
+set_flux_version ${config_images_memcached} ${config_images_flux} "$(git_http_url "$(git_remote_fetchurl "${git_remote}")")"
+set_wksctl_version ${config_images_wksctl}
+# wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)" && log "Init completed"
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
