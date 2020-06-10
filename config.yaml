@@ -36,7 +36,9 @@ images:
   wksctl: weaveworks/wksctl-controller:v0.8.2-beta.7
   # CD propagation of images and config changes to the cluster
   # https://hub.docker.com/r/fluxcd/flux/tags
-  flux: fluxcd/flux:1.14.2
+  flux: fluxcd/flux:1.19.0
+  # flux: fluxcd/flux:1.14.2
   # General-purpose distributed memory object caching system
   # https://hub.docker.com/_/memcached?tab=tags
-  memcached: memcached:1.4.25
+  # memcached: memcached:1.4.25
+  memcached: memcached:1.6.6
