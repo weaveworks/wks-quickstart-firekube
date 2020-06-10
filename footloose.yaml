@@ -8,9 +8,9 @@ machines:
     ignite:
       cpus: 2
       diskSize: 5GB
-      kernel: weaveworks/ignite-kernel:5.4.43
+      kernel: docker.io/weaveworks/ignite-kernel:5.4.43
       memory: 1GB
-    image: weaveworks/ignite-centos:7
+    image: docker.io/weaveworks/ignite-centos:7
     name: node%d
     portMappings:
     - containerPort: 22

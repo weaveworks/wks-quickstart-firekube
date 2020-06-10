@@ -29,16 +29,16 @@ versions:
   wksctl: 0.8.2-beta.7
 images:
   footloose: quay.io/footloose/centos7:0.6.3
-  ignite: weaveworks/ignite-centos:7
-  kernel: weaveworks/ignite-kernel:5.4.43
+  ignite: docker.io/weaveworks/ignite-centos:7
+  kernel: docker.io/weaveworks/ignite-kernel:5.4.43
   # Manage cluster and machine descriptions using Git
   # https://hub.docker.com/r/weaveworks/wksctl-controller/tags
   wksctl: docker.io/weaveworks/wksctl-controller:v0.8.2-beta.7
   # CD propagation of images and config changes to the cluster
   # https://hub.docker.com/r/fluxcd/flux/tags
-  # flux: fluxcd/flux:1.19.0
-  flux: fluxcd/flux:1.14.2
+  flux: docker.io/fluxcd/flux:1.19.0
+  # flux: fluxcd/flux:1.14.2
   # General-purpose distributed memory object caching system
   # https://hub.docker.com/_/memcached?tab=tags
-  memcached: memcached:1.4.25
-  # memcached: memcached:1.6.6
+  # memcached: memcached:1.4.25
+  memcached: docker.io/memcached:1.6.6
