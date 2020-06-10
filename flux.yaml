@@ -63,7 +63,7 @@ items:
         - args:
           - -m 64
           - -p 11211
-          image: docker.io/memcached:1.6.5
+          image: docker.io/memcached:1.6.6
           imagePullPolicy: IfNotPresent
           name: memcached
           ports:
