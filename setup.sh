@@ -134,7 +134,9 @@ if [ "$(config_backend)" == "ignite" ]; then
 fi
 check_version wksctl "${WKSCTL_VERSION}"
 
-log "Creating footloose manifest"
+set_docker_version ${config_versions_docker}
+
+log "Creating footloose manifests"
 jk generate -f config.yaml setup.js
 
 cluster_key="cluster-key"
