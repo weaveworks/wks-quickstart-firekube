@@ -9,8 +9,49 @@
 #            https://github.com/weaveworks/ignite.
 backend: ignite
 
-# Number of nodes allocated for the Kubernetes control plane and workers.
-controlPlane:
-  nodes: 1
-workers:
-  nodes: 1
+cluster:
+  name: example
+  namespace: weavek8sops
+  controlPlane:
+    nodes: 1
+    cpus: 2 # multiples of 2
+    memory: 1GB
+    diskSize: 5GB
+  workers:
+    nodes: 1
+    cpus: 4 # multiples of 2
+    memory: 1GB
+    diskSize: 10GB
+versions:
+  # https://kubernetes.io/docs/setup/release/version-skew-policy/
+  # https://github.com/kubernetes/kubelet/releases
+  kubelet: 1.17.5
+  # https://github.com/jkcfg/jk/releases
+  jk: 0.4.0
+  # https://github.com/weaveworks/footloose/releases
+  footloose: 0.6.3
+  # https://github.com/weaveworks/ignite/releases
+  ignite: 0.7.0
+  # https://github.com/weaveworks/wksctl/releases
+  wksctl: 0.8.2
+  # https://github.com/docker/docker-ce/releases
+  docker: 19.03.11
+images:
+  # https://github.com/weaveworks/footloose/releases
+  footloose: quay.io/footloose/centos7:0.6.3
+  # https://hub.docker.com/r/weaveworks/ignite-centos/tags
+  ignite: docker.io/weaveworks/ignite-centos:7
+  # https://hub.docker.com/r/weaveworks/ignite-kernel/tags
+  kernel: docker.io/weaveworks/ignite-kernel:5.4.43
+  # Manage cluster and machine descriptions using Git
+  # https://hub.docker.com/r/weaveworks/wksctl-controller/tags
+  wksctl: docker.io/weaveworks/wksctl-controller:v0.8.2
+  # CD propagation of images and config changes to the cluster
+  # https://github.com/fluxcd/flux/releases
+  # https://hub.docker.com/r/fluxcd/flux/tags
+  flux: docker.io/fluxcd/flux:1.19.0
+  # General-purpose distributed memory object caching system
+  # https://github.com/memcached/memcached/wiki/ReleaseNotes
+  # https://hub.docker.com/_/memcached?tab=tags
+  memcached: docker.io/memcached:1.6.6
+  # https://github.com/weaveworks/weave/releases/ #download/v2.6.2/weave
