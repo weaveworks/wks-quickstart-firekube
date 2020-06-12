@@ -6,7 +6,7 @@ let output = [];
 
 const backend = {
   docker: {
-    image: 'quay.io/footloose/centos7:0.6.0',
+    image: config.images.footloose,
     // The below is required for dockerd to run smoothly.
     // See also: https://github.com/weaveworks/footloose#running-dockerd-in-container-machines
     privileged: true,
@@ -42,7 +42,7 @@ const work_node = config => backend[config.backend].work_node;
 
 const footloose = config => ({
   cluster: {
-    name: 'firekube',
+    name: config.cluster.name,
     privateKey: 'cluster-key',
   },
   machines: [{
@@ -111,7 +111,7 @@ const Machine = ({ id, privateIP, sshPort, role }) => ({
       set: role,
     },
     name: `${role}-${id}`,
-    namespace: 'weavek8sops'
+    namespace: config.cluster.namespace
   },
   spec: {
     providerSpec: {
@@ -127,6 +127,9 @@ const Machine = ({ id, privateIP, sshPort, role }) => ({
           port: 22,
         }
       }
+    },
+    versions: {
+      kubelet: config.versions.kubelet
     }
   }
 });
@@ -136,7 +139,7 @@ const sshPort = machine => machine.ports.find(p => p.guest == 22).host;
 if (config.machines !== undefined) {
   const machines = [];
 
-  for (let i = 0; i < config.controlPlane.nodes; i++ ) {
+  for (let i = 0; i < config.cluster.controlPlane.nodes; i++ ) { 
     const machine = config.machines[i];
     machines.push(Machine({
       id: i,
@@ -146,8 +149,8 @@ if (config.machines !== undefined) {
     }));
   }
 
-  for (let i = 0; i < config.workers.nodes; i++ ) {
-    const machine = config.machines[config.controlPlane.nodes + i];
+  for (let i = 0; i < config.cluster.workers.nodes; i++ ) {
+    const machine = config.machines[config.cluster.controlPlane.nodes + i];
     machines.push(Machine({
       id: i,
       privateIP: machine.runtimeNetworks[0].ip,

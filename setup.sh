@@ -19,30 +19,13 @@ fi
 
 set -euo pipefail
 
-JK_VERSION=0.3.0
-FOOTLOOSE_VERSION=0.6.2
-IGNITE_VERSION=0.5.5
-WKSCTL_VERSION=0.8.1
+# On macOS, we only support the docker backend.
+if [ "$(goos)" == "darwin" ]; then
+    set_config_backend docker
+fi
 
-config_backend() {
-    sed -n -e 's/^backend: *\(.*\)/\1/p' config.yaml
-}
-
-set_config_backend() {
-    local tmp=.config.yaml.tmp
-
-    sed -e "s/^backend: .*$/backend: ${1}/" config.yaml > "${tmp}" && \
-        mv "${tmp}" config.yaml && \
-        rm -f "${tmp}"
-}
-
-do_footloose() {
-    if [ "$(config_backend)" == "ignite" ]; then
-        $sudo env "PATH=${PATH}" footloose "${@}"
-    else
-        footloose "${@}"
-    fi
-}
+# Parse all the config values after checking for macOS 
+eval $(parse_yaml config.yaml "config_") 
 
 if git_current_branch > /dev/null 2>&1; then
     log "Using git branch: $(git_current_branch)"
@@ -121,18 +104,13 @@ if [ "${download}" == "yes" ]; then
     export PATH="${HOME}/.wks/bin:${PATH}"
 fi
 
-# On macOS, we only support the docker backend.
-if [ "$(goos)" == "darwin" ]; then
-    set_config_backend docker
-fi
-
 check_command docker
-check_version jk "${JK_VERSION}"
-check_version footloose "${FOOTLOOSE_VERSION}"
-if [ "$(config_backend)" == "ignite" ]; then
-    check_version ignite "${IGNITE_VERSION}"
+check_version jk "${config_versions_jk}" 
+check_version footloose "${config_versions_footloose}"
+if [ "$config_backend" == "ignite" ]; then 
+    check_version ignite "${config_versions_ignite}" 
 fi
-check_version wksctl "${WKSCTL_VERSION}"
+check_version wksctl "${config_versions_wksctl}"
 
 set_docker_version ${config_versions_docker}
 
@@ -149,6 +127,7 @@ fi
 log "Creating virtual machines"
 do_footloose create
 
+# The machines yaml is created using data from the footloose status json and the config.yaml 
 log "Creating Cluster API manifests"
 status="footloose-status.yaml"
 do_footloose status -o json > "${status}"
@@ -156,7 +135,8 @@ jk generate -f config.yaml -f "${status}" setup.js
 rm -f "${status}"
 
 log "Updating container images and git parameters"
-wksctl init --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
+# FIXME: wksctl init fails to update flux.yaml and wks-controller.yaml
+wksctl init -e --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
