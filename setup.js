@@ -4,8 +4,6 @@ import * as std from '@jkcfg/std'
 const config = param.all();
 let output = [];
 
-const numNodes = config => config.controlPlane.nodes + config.workers.nodes;
-
 const backend = {
   docker: {
     image: 'quay.io/footloose/centos7:0.6.0',
@@ -19,21 +17,28 @@ const backend = {
   },
   ignite: {
     image: config.images.ignite,
-    ignite: {
-      cpus: config.cluster.cpus,
-      memory: config.cluster.memory,
-      diskSize: config.cluster.diskSize,
-      kernel: config.images.kernel,
-    }, 
     privileged: false,
     volumes: [],
+    ctrl_plane: {
+      cpus: config.cluster.controlPlane.cpus,
+      memory: config.cluster.controlPlane.memory,
+      diskSize: config.cluster.controlPlane.diskSize,
+      kernel: config.images.kernel,
+    }, 
+    work_node: {
+      cpus: config.cluster.workers.cpus,
+      memory: config.cluster.workers.memory,
+      diskSize: config.cluster.workers.diskSize,
+      kernel: config.images.kernel,
+    },
   },
 };
 
 const image = config => backend[config.backend].image;
 const privileged = config => backend[config.backend].privileged;
 const volumes = config => backend[config.backend].volumes;
-const ignite = config => backend[config.backend].ignite;
+const ctrl_plane = config => backend[config.backend].ctrl_plane;
+const work_node = config => backend[config.backend].work_node;
 
 const footloose = config => ({
   cluster: {
@@ -41,12 +46,34 @@ const footloose = config => ({
     privateKey: 'cluster-key',
   },
   machines: [{
-    count: numNodes(config),
+    count: config.cluster.controlPlane.nodes,
     spec: {
-      name: 'node%d',
+      name: 'ctrl-%d',
       image: image(config),
       backend: config.backend,
-      ignite: ignite(config),
+      ignite: ctrl_plane(config), 
+      portMappings: [{
+        containerPort: 22,
+        hostPort: 2222,
+      }, {
+        containerPort: 6443,
+        hostPort: 6443,
+      }, {
+        containerPort: 30443,
+        hostPort: 30443,
+      }, {
+        containerPort: 30080,
+        hostPort: 30080,
+      }],
+      privileged: privileged(config),
+      volumes: volumes(config),
+    }},{
+    count: config.cluster.workers.nodes,
+    spec: {
+      name: 'work-%d',
+      image: image(config),
+      backend: config.backend,
+      ignite: work_node(config), 
       portMappings: [{
         containerPort: 22,
         hostPort: 2222,
