@@ -63,7 +63,7 @@ items:
         - args:
           - -m 64
           - -p 11211
-          image: docker.io/memcached:1.6.6
+          image: memcached:1.4.25
           imagePullPolicy: IfNotPresent
           name: memcached
           ports:
@@ -110,7 +110,7 @@ items:
         containers:
         - args:
           - --ssh-keygen-dir=/var/fluxd/keygen
-          - --git-url=https://github.com/roobyz/wks-quickstart-firekube.git
+          - --git-url=https://github.com/weaveworks/wks-quickstart-firekube.git
           - --git-branch=master
           - --git-poll-interval=30s
           - --git-path=.
@@ -119,8 +119,7 @@ items:
           - --memcached-service=memcached
           - --listen-metrics=:3031
           - --sync-garbage-collection
-          - --manifest-generation=true
-          image: docker.io/fluxcd/flux:1.19.0
+          image: fluxcd/flux:1.14.2
           imagePullPolicy: IfNotPresent
           name: flux
           ports:

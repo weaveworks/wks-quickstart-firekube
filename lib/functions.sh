@@ -227,3 +227,29 @@ do_footloose() {
         footloose "${@}"
     fi
 }
+
+set_wksctl_version() {
+    local tmp=.config.yaml.tmp
+
+    awk -v repl="image: ${1}" '/image:/ && /wksctl/ {
+        sub(/image.*/, repl) } 1' wks-controller.yaml > "${tmp}" && \
+        mv "${tmp}" wks-controller.yaml && \
+        rm -f "${tmp}"
+}
+
+set_flux_version() {
+    local tmp=.config.yaml.tmp
+
+    awk -v repl="image: ${1}" '/image:/ && /memcached/ {
+        sub(/image.*/, repl) } 1' flux.yaml > "${tmp}" && \
+        mv "${tmp}" flux.yaml && \
+        rm -f "${tmp}"
+    awk -v repl="image: ${2}" '/image:/ && /flux/ {
+        sub(/image.*/, repl) } 1' flux.yaml > "${tmp}" && \
+        mv "${tmp}" flux.yaml && \
+        rm -f "${tmp}"
+    awk -v repl="git-url=${3}" '/git-url=/ {
+        sub(/git-url=.*/, repl) } 1' flux.yaml > "${tmp}" && \
+        mv "${tmp}" flux.yaml && \
+        rm -f "${tmp}"
+}

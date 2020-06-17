@@ -136,7 +136,9 @@ rm -f "${status}"
 
 log "Updating container images and git parameters"
 # FIXME: wksctl init fails to update flux.yaml and wks-controller.yaml
-wksctl init -e --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
+# wksctl init -e --git-url="$(git_http_url "$(git_remote_fetchurl "${git_remote}")")" --git-branch="$(git_current_branch)"
+set_flux_version ${config_images_memcached} ${config_images_flux} "$(git_http_url "$(git_remote_fetchurl "${git_remote}")")"
+set_wksctl_version ${config_images_wksctl}
 
 log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
@@ -151,4 +153,5 @@ apply_args=(
 )
 [ "${git_deploy_key}" ] && apply_args+=("${git_deploy_key}")
 wksctl apply "${apply_args[@]}"
+# wksctl apply #--verbose
 wksctl kubeconfig

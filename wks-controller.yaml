@@ -1,4 +1,3 @@
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -42,7 +41,7 @@ spec:
         operator: Exists
       containers:
       - name: controller
-        image: docker.io/weaveworks/wksctl-controller:v0.8.2
+        image: quay.io/wksctl/controller:latest
         command:
         - /bin/controller
         - --verbose
