@@ -45,7 +45,7 @@ images:
   kernel: docker.io/weaveworks/ignite-kernel:5.4.43
   # Manage cluster and machine descriptions using Git
   # https://hub.docker.com/r/weaveworks/wksctl-controller/tags
-  wksctl: docker.io/weaveworks/wksctl-controller:v0.8.2
+  wksctl: docker.io/weaveworks/wksctl-controller:v0.8.3-rc.1
   # CD propagation of images and config changes to the cluster
   # https://github.com/fluxcd/flux/releases
   # https://hub.docker.com/r/fluxcd/flux/tags
