@@ -8,7 +8,7 @@ const numNodes = config => config.controlPlane.nodes + config.workers.nodes;
 
 const backend = {
   docker: {
-    image: 'quay.io/footloose/centos7:0.6.0',
+    image: 'quay.io/footloose/centos7:0.6.3',
     // The below is required for dockerd to run smoothly.
     // See also: https://github.com/weaveworks/footloose#running-dockerd-in-container-machines
     privileged: true,
@@ -18,7 +18,7 @@ const backend = {
     }]
   },
   ignite: {
-    image: 'weaveworks/ignite-centos:firekube-pre3',
+    image: 'weaveworks/ignite-centos:7-v0.7.0',
     privileged: false,
     volumes: [],
   },
@@ -74,7 +74,7 @@ const List = items => ({
 });
 
 // Machine returns a WKS machine description from a configuration object describing its public IP, private IP, id, and its role.
-const Machine = ({ id, privateIP, sshPort, role }) => ({
+const Machine = ({ id, privateIP, sshPort, role, kubeVersion }) => ({
   apiVersion: 'cluster.k8s.io/v1alpha1',
   kind: 'Machine',
   metadata: {
@@ -85,6 +85,10 @@ const Machine = ({ id, privateIP, sshPort, role }) => ({
     namespace: 'weavek8sops'
   },
   spec: {
+    versions: {
+      kubelet: `${kubeVersion}`,
+      controlPlane: `${kubeVersion}`
+    },
     providerSpec: {
       value: {
         apiVersion: 'baremetalproviderspec/v1alpha1',
@@ -114,6 +118,7 @@ if (config.machines !== undefined) {
       privateIP: machine.runtimeNetworks[0].ip,
       sshPort: sshPort(machine),
       role: 'master',
+      kubeVersion: config.version,
     }));
   }
 
@@ -124,6 +129,7 @@ if (config.machines !== undefined) {
       privateIP: machine.runtimeNetworks[0].ip,
       sshPort: sshPort(machine),
       role: 'worker',
+      kubeVersion: config.version,
     }));
   }
 

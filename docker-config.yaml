@@ -12,5 +12,8 @@ data:
       },
       "exec-opts": [
         "native.cgroupdriver=cgroupfs"
+      ],
+      "insecure-registries" : [
+        "172.17.0.222:5000"
       ]
     }
