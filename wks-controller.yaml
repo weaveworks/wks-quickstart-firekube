@@ -42,7 +42,12 @@ spec:
         operator: Exists
       containers:
       - name: controller
-        image: quay.io/wksctl/controller:latest
+        env:
+        - name: FOOTLOOSE_SERVER_ADDR
+          value: 172.17.0.1
+        - name: FOOTLOOSE_BACKEND
+          value: docker
+        image: docker.io/weaveworks/wksctl-controller:<version>
         command:
         - /bin/controller
         - --verbose
