@@ -15,7 +15,7 @@ wksctl_download() {
     local cmd="${1}"
     local version="${2}"
 
-    do_curl_tarball "${cmd}" "https://github.com/weaveworks/wksctl/releases/download/${version}/wksctl-${version}-$(goos)-$(arch).tar.gz"
+    do_curl_tarball "${cmd}" "https://github.com/weaveworks/wksctl/releases/download/v${version}/wksctl-${version}-$(goos)-$(arch).tar.gz"
 }
 
 wksctl_version() {

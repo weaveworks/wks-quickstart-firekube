@@ -111,7 +111,7 @@ items:
         - args:
           - --ssh-keygen-dir=/var/fluxd/keygen
           - --git-url=https://github.com/weaveworks/wks-quickstart-firekube.git
-          - --git-branch=master
+          - --git-branch=fix-0-8-4
           - --git-poll-interval=30s
           - --git-path=.
           - --git-readonly
