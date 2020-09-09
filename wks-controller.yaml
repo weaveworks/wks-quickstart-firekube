@@ -47,7 +47,7 @@ spec:
           value: 172.17.0.1
         - name: FOOTLOOSE_BACKEND
           value: docker
-        image: docker.io/weaveworks/wksctl-controller:<version>
+        image: docker.io/weaveworks/wksctl-controller:v0.8.4
         command:
         - /bin/controller
         - --verbose
