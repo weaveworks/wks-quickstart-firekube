@@ -11,6 +11,6 @@ backend: ignite
 
 # Number of nodes allocated for the Kubernetes control plane and workers.
 controlPlane:
-  nodes: 2
+  nodes: 1 
 workers:
-  nodes: 3
+  nodes: 2
