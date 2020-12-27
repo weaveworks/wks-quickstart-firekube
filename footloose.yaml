@@ -2,7 +2,7 @@ cluster:
   name: firekube
   privateKey: cluster-key
 machines:
-- count: 2
+- count: 5
   spec:
     backend: ignite
     ignite:
