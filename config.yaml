@@ -13,4 +13,4 @@ backend: ignite
 controlPlane:
   nodes: 1 
 workers:
-  nodes: 2
+  nodes: 1
