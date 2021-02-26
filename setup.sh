@@ -160,7 +160,21 @@ log "Pushing initial cluster configuration"
 git add config.yaml footloose.yaml machines.yaml flux.yaml wks-controller.yaml
 
 git diff-index --quiet HEAD || git commit -m "Initial cluster configuration"
-git push "${git_remote}" HEAD
+
+ORIGN=$(git config --get remote.origin.url)
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+echo 'Working on Repository: '$ORIGN
+echo 'On Branch: '$BRANCH
+
+read -p "Are you sure you want to push to \"$BRANCH\" ? (y/N): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]];
+then
+    git push "${git_remote}" HEAD
+else
+    echo "Push aborted."
+    exit
+fi
 
 log "Installing Kubernetes cluster"
 apply_args=(
