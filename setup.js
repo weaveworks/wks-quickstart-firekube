@@ -35,16 +35,10 @@ const footloose = config => ({
   },
   machines: [{
     count: numNodes(config),
+    backend: config.backend,
     spec: {
       image: image(config),
       name: 'node%d',
-      backend: config.backend,
-      ignite: {
-        cpus: 2,
-        memory: '1GB',
-        diskSize: '5GB',
-        kernel: 'weaveworks/ignite-kernel:4.19.47',
-      },
       portMappings: [{
         containerPort: 22,
         hostPort: 2222,
@@ -59,7 +53,13 @@ const footloose = config => ({
         hostPort: 30080,
       }],
       privileged: privileged(config),
-      volumes: volumes(config),
+    ignite: {
+      cpus: 2,
+      memory: '1GB',
+      diskSize: '5GB',
+      kernel: 'weaveworks/ignite-kernel:4.19.47',
+    },
+    volumes: volumes(config),
     },
   }],
 });
