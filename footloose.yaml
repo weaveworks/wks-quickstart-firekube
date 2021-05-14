@@ -4,13 +4,13 @@ cluster:
 machines:
 - count: 2
   spec:
-    backend: ignite
+    backend: docker
     ignite:
       cpus: 2
       diskSize: 5GB
       kernel: weaveworks/ignite-kernel:4.19.47
       memory: 1GB
-    image: weaveworks/ignite-centos:firekube-pre3
+    image: quay.io/footloose/centos7:0.6.0
     name: node%d
     portMappings:
     - containerPort: 22
@@ -21,5 +21,7 @@ machines:
       hostPort: 30443
     - containerPort: 30080
       hostPort: 30080
-    privileged: false
-    volumes: []
+    privileged: true
+    volumes:
+    - destination: /var/lib/docker
+      type: volume

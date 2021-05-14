@@ -7,7 +7,7 @@
 #  - ignite: use footloose with ignite and firecracker to create real VMs using:
 #            the ignite backend only works on linux as it requires KVM.
 #            https://github.com/weaveworks/ignite.
-backend: ignite
+backend: docker
 
 # Number of nodes allocated for the Kubernetes control plane and workers.
 controlPlane:
