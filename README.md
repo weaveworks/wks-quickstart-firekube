@@ -1,3 +1,7 @@
+# Deprecated
+
+This repository is no longer maintained. For a more up-to-date way to manage microVMs, please take a look at [Flintlock](https://github.com/weaveworks-liquidmetal/flintlock).
+
 # Firekube
 
 Firekube is a Kubernetes cluster working on top of [ignite][gh-ignite] and
